@@ -154,7 +154,7 @@ footer{text-align:center;padding:24px;color:#94a3b8;font-size:11px;border-top:1p
 <div class="grid" id="grid"></div>
 
 <footer id="footer">
-  GCS Group · Report generated on 17 Apr 2026, 04:09 PM IST · Auto-runs daily at 1:00 PM IST
+  GCS Group · Report generated on 17 Apr 2026, 04:27 PM IST · Auto-runs daily at 1:00 PM IST
 </footer>
 
 <script>
@@ -162,6 +162,22 @@ const ALL_DATA    = [{"name": "Mehak", "dates": {"2026-04-16": {"tasks": [{"titl
 const ALL_DATES   = ["2026-04-16"];
 const CAT_COLORS  = {"Meetings": "#5c6bc0", "Break / Leave": "#b0bec5", "Reporting & Review": "#00897b", "Communication": "#ef6c00", "Digital & Tech": "#0288d1", "Finance & Accounts": "#388e3c", "Operations": "#f57c00", "General Work": "#8e24aa"};
 const EMP_COLORS  = ["#5c6bc0", "#00897b", "#ef6c00", "#0288d1", "#388e3c", "#8e24aa", "#f57c00", "#d32f2f", "#0097a7", "#7b1fa2", "#c62828", "#2e7d32"];
+
+// ── FORMAT HELPERS ───────────────────────────────────────────────────────────
+function fmtHrs(hrs) {
+  // convert decimal hours → "Xh Ym"
+  const totalMins = Math.round(hrs * 60);
+  const h = Math.floor(totalMins / 60);
+  const m = totalMins % 60;
+  if (h === 0) return m + 'm';
+  if (m === 0) return h + 'h';
+  return h + 'h ' + m + 'm';
+}
+function fmtDate(iso) {
+  // YYYY-MM-DD → DD/MM
+  const parts = iso.slice(5).split('-');
+  return parts[1] + '/' + parts[0];
+}
 
 // ── DATE HELPERS ─────────────────────────────────────────────────────────────
 function today()     { return new Date().toISOString().slice(0,10); }
@@ -221,9 +237,9 @@ function calcStats(tasks) {
 // ── RENDER ───────────────────────────────────────────────────────────────────
 function generateInsights(stats) {
   const ins = [];
-  if (stats.work_hours>=7)       ins.push(['✅',`Excellent — ${stats.work_hours}h of productive work`]);
-  else if (stats.work_hours>=5)  ins.push(['👍',`Good effort — ${stats.work_hours}h of work logged`]);
-  else if (stats.work_hours>0)   ins.push(['⚠️',`Low activity — only ${stats.work_hours}h logged`]);
+  if (stats.work_hours>=7)       ins.push(['✅',`Excellent — ${fmtHrs(stats.work_hours)} of productive work`]);
+  else if (stats.work_hours>=5)  ins.push(['👍',`Good effort — ${fmtHrs(stats.work_hours)} of work logged`]);
+  else if (stats.work_hours>0)   ins.push(['⚠️',`Low activity — only ${fmtHrs(stats.work_hours)} logged`]);
   else                           ins.push(['❌','No work activities recorded']);
   const workCats = Object.fromEntries(Object.entries(stats.categories).filter(([k])=>k!=='Break / Leave'));
   if (Object.keys(workCats).length) {
@@ -262,14 +278,14 @@ function renderCard(emp, idx, from, to) {
   const workCats = Object.entries(stats.categories).filter(([k])=>k!=='Break / Leave').sort((a,b)=>b[1]-a[1]);
   const catTags = workCats.map(([k,v]) => {
     const clr = CAT_COLORS[k]||'#999';
-    return `<span class="cat-tag" style="background:${clr}22;color:${clr};border:1px solid ${clr}55">${k} · ${Math.round(v/60*10)/10}h</span>`;
+    return `<span class="cat-tag" style="background:${clr}22;color:${clr};border:1px solid ${clr}55">${k} · ${fmtHrs(v/60)}</span>`;
   }).join('');
 
   // Break/Leave separate tag
   const breakMins = stats.categories['Break / Leave']||0;
   const breakHrs  = Math.round(breakMins/60*10)/10;
   const breakTag  = breakMins>0
-    ? `<span class="cat-section-label">⏸ Breaks & Leave</span><span class="cat-tag" style="background:#b0bec522;color:#607d8b;border:1px solid #b0bec555">Break / Leave · ${breakHrs}h</span>`
+    ? `<span class="cat-section-label">⏸ Breaks & Leave</span><span class="cat-tag" style="background:#b0bec522;color:#607d8b;border:1px solid #b0bec555">Break / Leave · ${fmtHrs(breakHrs)}</span>`
     : '';
 
   // Hours summary bar
@@ -280,21 +296,21 @@ function renderCard(emp, idx, from, to) {
   const hoursBar = `
   <div class="hours-bar">
     <div class="hrs-item hrs-neutral">
-      <span class="hrs-val">${STD}h</span>
+      <span class="hrs-val">${fmtHrs(STD)}</span>
       <span class="hrs-lbl">Standard</span>
     </div>
     <span class="hrs-sep">−</span>
     <div class="hrs-item hrs-break">
-      <span class="hrs-val">${breakHrs}h</span>
+      <span class="hrs-val">${fmtHrs(breakHrs)}</span>
       <span class="hrs-lbl">Break/Leave</span>
     </div>
     <span class="hrs-sep">=</span>
     <div class="hrs-item hrs-neutral">
-      <span class="hrs-val">${actualWork}h</span>
+      <span class="hrs-val">${fmtHrs(actualWork)}</span>
       <span class="hrs-lbl">Actual Work</span>
     </div>
     <div class="hrs-item ${isOver?'hrs-ok':'hrs-gap'}" style="margin-left:8px">
-      <span class="hrs-val">${isOver?'🟢':'🔴'} ${Math.abs(diff)}h</span>
+      <span class="hrs-val">${isOver?'🟢':'🔴'} ${fmtHrs(Math.abs(diff))}</span>
       <span class="hrs-lbl">${isOver?'Overtime':'Gap'}</span>
     </div>
   </div>`;
@@ -302,7 +318,7 @@ function renderCard(emp, idx, from, to) {
   // Task list
   const taskRows = allTasks.sort((a,b)=>a.start.localeCompare(b.start)).map(t => {
     const clr = CAT_COLORS[t.category]||'#999';
-    const dur = t.duration<60 ? t.duration+'m' : Math.round(t.duration/60*10)/10+'h';
+    const dur = fmtHrs(t.duration/60);
     return `<div class="task-row">
       <span class="task-dot" style="background:${clr}"></span>
       <div class="task-content">
@@ -325,7 +341,7 @@ function renderCard(emp, idx, from, to) {
         <h3>${emp.name}</h3>
         <div class="emp-meta">
           <span class="badge" style="background:${color}22;color:${color}">${stats.work_tasks} tasks</span>
-          <span class="badge" style="background:${color}22;color:${color}">${stats.work_hours}h work</span>
+          <span class="badge" style="background:${color}22;color:${color}">${fmtHrs(stats.work_hours)} work</span>
           <span class="stars">${stars}</span>
         </div>
         <div class="emp-time">🕐 ${stats.start_time} – ${stats.end_time}</div>
@@ -364,8 +380,8 @@ function renderAll(from, to) {
   // Update header stats
   document.getElementById('hd-members').textContent = ALL_DATA.length;
   document.getElementById('hd-active').textContent   = active;
-  document.getElementById('hd-avghrs').textContent   = active ? (Math.round(totalWh/active*10)/10)+'h' : '—';
-  document.getElementById('hd-date').textContent     = from===to ? from.slice(5).replace('-','/') : from.slice(5).replace('-','/')+'–'+to.slice(5).replace('-','/');
+  document.getElementById('hd-avghrs').textContent   = active ? fmtHrs(totalWh/active) : '—';
+  document.getElementById('hd-date').textContent     = from===to ? fmtDate(from) : fmtDate(from)+'–'+fmtDate(to);
 }
 
 function applyFilter() {
