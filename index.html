@@ -55,8 +55,20 @@ body{font-family:'Inter',sans-serif;background:#eef2ff;color:#1e293b;min-height:
 .emp-time{font-size:11px;color:#94a3b8;margin-top:2px}
 
 /* CAT TAGS */
-.cat-legend{padding:7px 20px 10px;display:flex;gap:5px;flex-wrap:wrap}
+.cat-legend{padding:7px 20px 4px;display:flex;gap:5px;flex-wrap:wrap}
+.cat-section-label{font-size:10px;font-weight:600;color:#94a3b8;width:100%;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 .cat-tag{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+
+/* HOURS BAR */
+.hours-bar{display:flex;align-items:center;gap:4px;padding:8px 20px 6px;flex-wrap:wrap;border-top:1px solid #f1f5f9;background:#fafbff}
+.hrs-item{display:flex;flex-direction:column;align-items:center;padding:5px 11px;border-radius:10px;min-width:66px}
+.hrs-val{font-size:14px;font-weight:700}
+.hrs-lbl{font-size:9px;color:#94a3b8;margin-top:1px;text-transform:uppercase;letter-spacing:.4px}
+.hrs-sep{color:#cbd5e1;font-size:16px;font-weight:300;padding:0 2px}
+.hrs-gap{background:#fff1f2;color:#dc2626}
+.hrs-ok{background:#f0fdf4;color:#16a34a}
+.hrs-neutral{background:#f1f5f9;color:#475569}
+.hrs-break{background:#f8fafc;color:#64748b}
 
 /* TABS */
 .card-tabs{display:flex;border-top:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9}
@@ -142,7 +154,7 @@ footer{text-align:center;padding:24px;color:#94a3b8;font-size:11px;border-top:1p
 <div class="grid" id="grid"></div>
 
 <footer id="footer">
-  GCS Group · Report generated on 17 Apr 2026, 02:06 PM IST · Auto-runs daily at 1:00 PM IST
+  GCS Group · Report generated on 17 Apr 2026, 04:09 PM IST · Auto-runs daily at 1:00 PM IST
 </footer>
 
 <script>
@@ -246,12 +258,46 @@ function renderCard(emp, idx, from, to) {
   const insights = generateInsights(stats);
   const stars = '★'.repeat(Math.min(5,Math.max(1,Math.round(stats.work_hours/8*5)))) + '☆'.repeat(5-Math.min(5,Math.max(1,Math.round(stats.work_hours/8*5))));
 
-  // Category legend
+  // Work category tags
   const workCats = Object.entries(stats.categories).filter(([k])=>k!=='Break / Leave').sort((a,b)=>b[1]-a[1]);
   const catTags = workCats.map(([k,v]) => {
     const clr = CAT_COLORS[k]||'#999';
     return `<span class="cat-tag" style="background:${clr}22;color:${clr};border:1px solid ${clr}55">${k} · ${Math.round(v/60*10)/10}h</span>`;
   }).join('');
+
+  // Break/Leave separate tag
+  const breakMins = stats.categories['Break / Leave']||0;
+  const breakHrs  = Math.round(breakMins/60*10)/10;
+  const breakTag  = breakMins>0
+    ? `<span class="cat-section-label">⏸ Breaks & Leave</span><span class="cat-tag" style="background:#b0bec522;color:#607d8b;border:1px solid #b0bec555">Break / Leave · ${breakHrs}h</span>`
+    : '';
+
+  // Hours summary bar
+  const STD = 9;
+  const actualWork = stats.work_hours;
+  const diff = Math.round((actualWork - STD)*10)/10;
+  const isOver = diff >= 0;
+  const hoursBar = `
+  <div class="hours-bar">
+    <div class="hrs-item hrs-neutral">
+      <span class="hrs-val">${STD}h</span>
+      <span class="hrs-lbl">Standard</span>
+    </div>
+    <span class="hrs-sep">−</span>
+    <div class="hrs-item hrs-break">
+      <span class="hrs-val">${breakHrs}h</span>
+      <span class="hrs-lbl">Break/Leave</span>
+    </div>
+    <span class="hrs-sep">=</span>
+    <div class="hrs-item hrs-neutral">
+      <span class="hrs-val">${actualWork}h</span>
+      <span class="hrs-lbl">Actual Work</span>
+    </div>
+    <div class="hrs-item ${isOver?'hrs-ok':'hrs-gap'}" style="margin-left:8px">
+      <span class="hrs-val">${isOver?'🟢':'🔴'} ${Math.abs(diff)}h</span>
+      <span class="hrs-lbl">${isOver?'Overtime':'Gap'}</span>
+    </div>
+  </div>`;
 
   // Task list
   const taskRows = allTasks.sort((a,b)=>a.start.localeCompare(b.start)).map(t => {
@@ -286,7 +332,11 @@ function renderCard(emp, idx, from, to) {
       </div>
     </div>
 
-    <div class="cat-legend">${catTags}</div>
+    ${hoursBar}
+    <div class="cat-legend">
+      <span class="cat-section-label">💼 Work Categories</span>
+      ${catTags}${breakTag}
+    </div>
 
     <div class="card-tabs">
       <button class="tab-btn active" onclick="switchTab(this,'${cid}-tasks')">📋 Tasks</button>
