@@ -1,428 +1,1257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GCS Team Daily Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#eef2ff;color:#1e293b;min-height:100vh}
-
-/* HEADER */
-.site-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 55%,#db2777 100%);color:#fff;padding:28px 40px 22px}
-.header-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-icon{width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px}
-.brand h1{font-size:21px;font-weight:700}
-.brand p{font-size:12px;opacity:.8;margin-top:2px}
-.stat-row{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap}
-.stat-box{background:rgba(255,255,255,.18);border-radius:13px;padding:13px 20px;min-width:120px;backdrop-filter:blur(6px)}
-.stat-box .sval{font-size:26px;font-weight:700}
-.stat-box .slbl{font-size:11px;opacity:.85;margin-top:2px}
-
-/* DATE FILTER BAR */
-.filter-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 40px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.filter-bar label{font-size:12px;font-weight:600;color:#64748b;white-space:nowrap}
-.date-input{padding:7px 11px;border-radius:9px;border:1.5px solid #e2e8f0;font-size:12px;font-family:inherit;outline:none;color:#1e293b;transition:border .2s}
-.date-input:focus{border-color:#4f46e5}
-.quick-btn{padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:12px;font-weight:600;cursor:pointer;color:#475569;transition:all .2s;white-space:nowrap}
-.quick-btn:hover,.quick-btn.active{background:#4f46e5;color:#fff;border-color:#4f46e5}
-.apply-btn{padding:7px 18px;border-radius:20px;border:none;background:#4f46e5;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .2s}
-.apply-btn:hover{background:#4338ca}
-.search-wrap{margin-left:auto;display:flex;align-items:center;gap:6px}
-.search-wrap input{padding:7px 13px;border-radius:20px;border:1.5px solid #e2e8f0;font-size:12px;outline:none;width:180px;transition:border .2s}
-.search-wrap input:focus{border-color:#4f46e5}
-
-/* LEGEND BAR */
-.legend-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 40px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.gl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748b}
-.gl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-
-/* GRID */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:22px;padding:28px 40px;max-width:1600px;margin:0 auto}
-
-/* CARD */
-.emp-card{background:#fff;border-radius:18px;box-shadow:0 4px 20px rgba(79,70,229,.07),0 1px 4px rgba(0,0,0,.04);overflow:hidden;transition:transform .2s,box-shadow .2s}
-.emp-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(79,70,229,.13)}
-.card-header{display:flex;align-items:center;gap:13px;padding:16px 20px}
-.avatar{width:46px;height:46px;border-radius:13px;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.emp-info h3{font-size:15px;font-weight:700}
-.emp-meta{display:flex;gap:7px;align-items:center;margin-top:4px;flex-wrap:wrap}
-.badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
-.badge.grey{background:#f1f5f9;color:#94a3b8}
-.stars{font-size:12px;color:#f59e0b;letter-spacing:1px}
-.emp-time{font-size:11px;color:#94a3b8;margin-top:2px}
-
-/* CAT TAGS */
-.cat-legend{padding:7px 20px 4px;display:flex;gap:5px;flex-wrap:wrap}
-.cat-section-label{font-size:10px;font-weight:600;color:#94a3b8;width:100%;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
-.cat-tag{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
-
-/* HOURS BAR */
-.hours-bar{display:flex;align-items:center;gap:4px;padding:8px 20px 6px;flex-wrap:wrap;border-top:1px solid #f1f5f9;background:#fafbff}
-.hrs-item{display:flex;flex-direction:column;align-items:center;padding:5px 11px;border-radius:10px;min-width:66px}
-.hrs-val{font-size:14px;font-weight:700}
-.hrs-lbl{font-size:9px;color:#94a3b8;margin-top:1px;text-transform:uppercase;letter-spacing:.4px}
-.hrs-sep{color:#cbd5e1;font-size:16px;font-weight:300;padding:0 2px}
-.hrs-gap{background:#fff1f2;color:#dc2626}
-.hrs-ok{background:#f0fdf4;color:#16a34a}
-.hrs-neutral{background:#f1f5f9;color:#475569}
-.hrs-break{background:#f8fafc;color:#64748b}
-
-/* TABS */
-.card-tabs{display:flex;border-top:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9}
-.tab-btn{flex:1;padding:9px;font-size:12px;font-weight:600;background:none;border:none;cursor:pointer;color:#94a3b8;transition:all .15s}
-.tab-btn.active{color:#4f46e5;border-bottom:2px solid #4f46e5}
-.tab-btn:hover{background:#f8fafc}
-.tab-pane{padding:12px 20px 14px;max-height:240px;overflow-y:auto;display:none}
-.tab-pane.active{display:block}
-
-/* TASK LIST */
-.task-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #f8fafc}
-.task-row:last-child{border-bottom:none}
-.task-dot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.task-content{flex:1;min-width:0}
-.task-time{font-size:10px;color:#94a3b8}
-.task-title{font-size:12px;font-weight:500;margin-top:1px;display:block}
-.task-dur{font-size:11px;color:#64748b;font-weight:600;white-space:nowrap;flex-shrink:0}
-
-/* INSIGHTS */
-.insights-box{display:flex;flex-direction:column;gap:7px}
-.insight-item{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border-radius:9px;padding:9px 11px;font-size:12px}
-
-/* NO DATA */
-.no-data-msg{padding:22px;text-align:center;color:#94a3b8;font-size:13px}
-
-/* EMPTY STATE */
-.empty-state{grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8}
-.empty-state div{font-size:48px;margin-bottom:12px}
-.empty-state p{font-size:15px}
-
-footer{text-align:center;padding:24px;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0;background:#fff;margin-top:8px}
-
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:#f1f5f9}
-::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:10px}
-
-@media(max-width:600px){
-  .site-header,.filter-bar,.legend-bar{padding-left:16px;padding-right:16px}
-  .grid{padding:14px 16px;grid-template-columns:1fr}
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F1F5F9; color: #1E293B; min-height: 100vh; }
+  
+  .header { background: linear-gradient(135deg, #1E293B 0%, #334155 100%); color: white; padding: 32px 24px; }
+  .header-inner { max-width: 1400px; margin: 0 auto; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .header .subtitle { color: #94A3B8; margin-top: 6px; font-size: 14px; }
+  .header .generated { color: #64748B; font-size: 12px; margin-top: 4px; }
+  
+  .stats-bar { background: white; border-bottom: 1px solid #E2E8F0; padding: 16px 24px; }
+  .stats-inner { max-width: 1400px; margin: 0 auto; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; }
+  .stat-value { font-size: 24px; font-weight: 700; color: #1E293B; }
+  .stat-label { font-size: 12px; color: #64748B; margin-top: 2px; }
+  .stat-divider { width: 1px; height: 40px; background: #E2E8F0; }
+  
+  .controls { max-width: 1400px; margin: 24px auto; padding: 0 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .filter-group { display: flex; align-items: center; gap: 8px; background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 8px 12px; }
+  .filter-group label { font-size: 13px; color: #64748B; font-weight: 500; white-space: nowrap; }
+  .filter-group select { border: none; outline: none; font-size: 14px; color: #1E293B; background: transparent; cursor: pointer; }
+  .filter-group input[type=text] { border: none; outline: none; font-size: 14px; color: #1E293B; background: transparent; width: 160px; }
+  .btn-all { background: #4F46E5; color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-all:hover { background: #4338CA; }
+  
+  .grid { max-width: 1400px; margin: 0 auto 40px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; }
+  
+  .emp-card { background: white; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.2s; }
+  .emp-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .emp-card.hidden { display: none; }
+  
+  .card-header { padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+  .emp-info { flex: 1; min-width: 0; }
+  .emp-name { font-size: 16px; font-weight: 600; color: #1E293B; }
+  .emp-meta { font-size: 12px; color: #64748B; margin-top: 2px; }
+  .task-badge { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  
+  .card-body { padding: 0 16px 16px; max-height: 420px; overflow-y: auto; }
+  .card-body::-webkit-scrollbar { width: 4px; }
+  .card-body::-webkit-scrollbar-track { background: #F8FAFC; }
+  .card-body::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 2px; }
+  
+  .date-group { margin-bottom: 12px; }
+  .date-label { font-size: 11px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 0 4px; border-top: 1px solid #F1F5F9; margin-top: 4px; }
+  .date-group:first-child .date-label { border-top: none; margin-top: 0; }
+  
+  .task-item { background: #F8FAFC; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; border-left: 3px solid #E2E8F0; transition: border-color 0.2s; }
+  .task-item:hover { border-left-color: #4F46E5; }
+  .task-title { font-size: 13px; color: #334155; font-weight: 500; line-height: 1.4; }
+  .task-time { font-size: 11px; color: #94A3B8; margin-top: 4px; }
+  .task-desc { font-size: 12px; color: #64748B; margin-top: 4px; font-style: italic; }
+  .no-tasks { color: #94A3B8; font-size: 13px; padding: 12px 0; text-align: center; }
+  
+  .footer { text-align: center; padding: 24px; color: #94A3B8; font-size: 12px; border-top: 1px solid #E2E8F0; background: white; }
+  
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    .stats-inner { gap: 16px; }
+  }
 </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-top">
-    <div class="brand">
-      <div class="brand-icon">📊</div>
-      <div>
-        <h1>GCS Team Daily Report</h1>
-        <p>Calendar-based productivity dashboard</p>
+<div class="header">
+  <div class="header-inner">
+    <h1>📊 GCS Team Daily Report</h1>
+    <div class="subtitle">Green City Security — Team Productivity Dashboard</div>
+    <div class="generated">Generated: 21/4/2026, 3:52:36 pm IST · Data: 16/04/2026 to 18/04/2026</div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-value">12</span><span class="stat-label">Team Members</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-value">228</span><span class="stat-label">Total Tasks</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-value">3</span><span class="stat-label">Days Covered</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-value">19.0</span><span class="stat-label">Avg Tasks / Person</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-value">18/04/2026</span><span class="stat-label">Latest Data</span></div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="filter-group">
+    <label>📅 Date:</label>
+    <select id="dateFilter" onchange="filterByDate()">
+      <option value="all">All Dates</option>
+      <option value="16/04/2026">16/04/2026</option><option value="17/04/2026">17/04/2026</option><option value="18/04/2026">18/04/2026</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>🔍 Search:</label>
+    <input type="text" id="searchBox" placeholder="Employee or task..." oninput="filterSearch()" />
+  </div>
+  <button class="btn-all" onclick="resetFilters()">Show All</button>
+</div>
+
+<div class="grid" id="empGrid">
+  
+  <div class="emp-card" data-emp="Mehak">
+    <div class="card-header" style="background: linear-gradient(135deg, #4F46E522, #4F46E511);">
+      <div class="avatar" style="background: #4F46E5;">M</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Mehak</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
       </div>
+      <div class="task-badge" style="background:#4F46E522; color:#4F46E5;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
     </div>
   </div>
-  <div class="stat-row">
-    <div class="stat-box"><div class="sval" id="hd-members">—</div><div class="slbl">Total Members</div></div>
-    <div class="stat-box"><div class="sval" id="hd-active">—</div><div class="slbl">Active Today</div></div>
-    <div class="stat-box"><div class="sval" id="hd-avghrs">—</div><div class="slbl">Avg Work Hours</div></div>
-    <div class="stat-box"><div class="sval" id="hd-date">—</div><div class="slbl">Viewing Period</div></div>
+  <div class="emp-card" data-emp="Rajinder">
+    <div class="card-header" style="background: linear-gradient(135deg, #7C3AED22, #7C3AED11);">
+      <div class="avatar" style="background: #7C3AED;">R</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Rajinder</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#7C3AED22; color:#7C3AED;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
   </div>
-</header>
-
-<div class="filter-bar">
-  <label>📅 From</label>
-  <input type="date" class="date-input" id="fromDate"/>
-  <label>To</label>
-  <input type="date" class="date-input" id="toDate"/>
-  <button class="quick-btn" id="btn-yesterday" onclick="setPreset('yesterday',this)">Yesterday</button>
-  <button class="quick-btn active" id="btn-today" onclick="setPreset('today',this)">Today</button>
-  <button class="quick-btn" id="btn-week" onclick="setPreset('week',this)">This Week</button>
-  <button class="quick-btn" id="btn-month" onclick="setPreset('month',this)">Monthly</button>
-  <button class="apply-btn" onclick="applyFilter()">Apply ▶</button>
-  <div class="search-wrap">
-    🔍<input type="text" id="searchInput" placeholder="Search employee…" oninput="searchCards(this.value)"/>
+  <div class="emp-card" data-emp="Priyanka">
+    <div class="card-header" style="background: linear-gradient(135deg, #EC489922, #EC489911);">
+      <div class="avatar" style="background: #EC4899;">P</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Priyanka</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#EC489922; color:#EC4899;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Arun Sharma">
+    <div class="card-header" style="background: linear-gradient(135deg, #EF444422, #EF444411);">
+      <div class="avatar" style="background: #EF4444;">AS</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Arun Sharma</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#EF444422; color:#EF4444;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Boney">
+    <div class="card-header" style="background: linear-gradient(135deg, #F59E0B22, #F59E0B11);">
+      <div class="avatar" style="background: #F59E0B;">B</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Boney</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#F59E0B22; color:#F59E0B;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Gunjan">
+    <div class="card-header" style="background: linear-gradient(135deg, #10B98122, #10B98111);">
+      <div class="avatar" style="background: #10B981;">G</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Gunjan</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#10B98122; color:#10B981;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Ayush">
+    <div class="card-header" style="background: linear-gradient(135deg, #06B6D422, #06B6D411);">
+      <div class="avatar" style="background: #06B6D4;">A</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Ayush</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#06B6D422; color:#06B6D4;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Diksha">
+    <div class="card-header" style="background: linear-gradient(135deg, #3B82F622, #3B82F611);">
+      <div class="avatar" style="background: #3B82F6;">D</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Diksha</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#3B82F622; color:#3B82F6;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Santosh K">
+    <div class="card-header" style="background: linear-gradient(135deg, #8B5CF622, #8B5CF611);">
+      <div class="avatar" style="background: #8B5CF6;">SK</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Santosh K</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#8B5CF622; color:#8B5CF6;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Devinder">
+    <div class="card-header" style="background: linear-gradient(135deg, #F9731622, #F9731611);">
+      <div class="avatar" style="background: #F97316;">D</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Devinder</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#F9731622; color:#F97316;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Alok">
+    <div class="card-header" style="background: linear-gradient(135deg, #14B8A622, #14B8A611);">
+      <div class="avatar" style="background: #14B8A6;">A</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Alok</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#14B8A622; color:#14B8A6;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
+  </div>
+  <div class="emp-card" data-emp="Rohit">
+    <div class="card-header" style="background: linear-gradient(135deg, #6366F122, #6366F111);">
+      <div class="avatar" style="background: #6366F1;">R</div>
+      <div class="emp-info">
+        <h3 class="emp-name">Rohit</h3>
+        <div class="emp-meta">19 tasks · High activity volume · 6.3 tasks/day avg</div>
+      </div>
+      <div class="task-badge" style="background:#6366F122; color:#6366F1;">19</div>
+    </div>
+    <div class="card-body">
+      <div class="date-group" data-date="16/04/2026">
+      <div class="date-label">16/04/2026</div><div class="task-item">
+        <div class="task-title">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+        <div class="task-time">🕐 09:15 – 10:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+        <div class="task-time">🕐 10:00 – 10:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+        <div class="task-time">🕐 10:30 – 11:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Follow Up for Cancellations & Refusals</div>
+        <div class="task-time">🕐 11:00 – 11:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Attended HOD'S Daily morning meeting</div>
+        <div class="task-time">🕐 11:35 – 11:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+        <div class="task-time">🕐 12:00 – 13:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Daily Meeting SK & BZ</div>
+        <div class="task-time">🕐 12:50 – 13:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">LUNCH BREAK</div>
+        <div class="task-time">🕐 13:10 – 13:50</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Half day leave</div>
+        <div class="task-time">🕐 14:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="17/04/2026">
+      <div class="date-label">17/04/2026</div><div class="task-item">
+        <div class="task-title">CL Audit</div>
+        <div class="task-time">🕐 14:00 – 15:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CALL AUDIT</div>
+        <div class="task-time">🕐 15:00 – 16:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">offline co ordination</div>
+        <div class="task-time">🕐 15:30 – 16:30</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM OF BZ AND SK</div>
+        <div class="task-time">🕐 16:00 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Post reminders for pending tasks</div>
+        <div class="task-time">🕐 16:45 – 17:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and walkins update</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Announcing the winner of back to back therapies</div>
+        <div class="task-time">🕐 17:00 – 17:15</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Marking Checklist & Delegation</div>
+        <div class="task-time">🕐 17:30 – 18:00</div>
+        
+      </div><div class="task-item">
+        <div class="task-title">Sending callers report to MD sir</div>
+        <div class="task-time">🕐 18:00 – 18:30</div>
+        
+      </div></div><div class="date-group" data-date="18/04/2026">
+      <div class="date-label">18/04/2026</div><div class="task-item">
+        <div class="task-title">CRM checking for BIPS and GHT</div>
+        <div class="task-time">🕐 17:00 – 18:00</div>
+        
+      </div></div>
+    </div>
   </div>
 </div>
 
-<div class="legend-bar">
-  <span style="font-size:11px;font-weight:600;color:#64748b">Categories:</span>
-  <span class="gl-item"><span class="gl-dot" style="background:#5c6bc0"></span>Meetings</span><span class="gl-item"><span class="gl-dot" style="background:#90a4ae"></span>Break</span><span class="gl-item"><span class="gl-dot" style="background:#e57373"></span>Leave</span><span class="gl-item"><span class="gl-dot" style="background:#00897b"></span>Reporting & Review</span><span class="gl-item"><span class="gl-dot" style="background:#ef6c00"></span>Communication</span><span class="gl-item"><span class="gl-dot" style="background:#0288d1"></span>Digital & Tech</span><span class="gl-item"><span class="gl-dot" style="background:#388e3c"></span>Finance & Accounts</span><span class="gl-item"><span class="gl-dot" style="background:#f57c00"></span>Operations</span><span class="gl-item"><span class="gl-dot" style="background:#8e24aa"></span>General Work</span>
+<div class="footer">
+  GCS Team Daily Report · Auto-generated from Google Calendar · 21/4/2026, 3:52:36 pm IST
 </div>
-
-<div class="grid" id="grid"></div>
-
-<footer id="footer">
-  GCS Group · Report generated on 17 Apr 2026, 04:41 PM IST · Auto-runs daily at 1:00 PM IST
-</footer>
 
 <script>
-const ALL_DATA    = [{"name": "Mehak", "dates": {"2026-04-16": {"tasks": [{"title": "Prepare Checklist Report for HO and  Present the same in HOD Meeting", "start": "09:15", "end": "10:00", "duration": 45, "category": "Meetings", "start_mins": 555, "end_mins": 600}, {"title": "Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register", "start": "10:00", "end": "10:30", "duration": 30, "category": "Reporting & Review", "start_mins": 600, "end_mins": 630}, {"title": "Prepare PT Invalid report and shared with Amit Kapoor sir to cross check", "start": "10:30", "end": "11:00", "duration": 30, "category": "Reporting & Review", "start_mins": 630, "end_mins": 660}, {"title": "Follow Up for Cancellations & Refusals", "start": "11:00", "end": "11:30", "duration": 30, "category": "Communication", "start_mins": 660, "end_mins": 690}, {"title": "Attended HOD'S Daily morning meeting", "start": "11:35", "end": "11:50", "duration": 15, "category": "Meetings", "start_mins": 695, "end_mins": 710}, {"title": "Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting", "start": "12:00", "end": "13:15", "duration": 75, "category": "Meetings", "start_mins": 720, "end_mins": 795}, {"title": "Daily Meeting SK & BZ", "start": "12:50", "end": "13:30", "duration": 40, "category": "Meetings", "start_mins": 770, "end_mins": 810}, {"title": "LUNCH BREAK", "start": "13:10", "end": "13:50", "duration": 40, "category": "Break", "start_mins": 790, "end_mins": 830}, {"title": "Half day leave", "start": "14:00", "end": "18:30", "duration": 270, "category": "Leave", "start_mins": 840, "end_mins": 1110}], "stats": {"total_tasks": 9, "work_tasks": 7, "work_hours": 4.4, "start_time": "09:15", "end_time": "18:30", "categories": {"Meetings": 175, "Reporting & Review": 60, "Communication": 30, "Break": 40, "Leave": 270}}}}}, {"name": "Rajinder", "dates": {"2026-04-16": {"tasks": [{"title": "Prepare invalid members report/Walkin report with audit", "start": "09:30", "end": "10:30", "duration": 60, "category": "Reporting & Review", "start_mins": 570, "end_mins": 630}, {"title": "Bill sent to bodyzone members - 15th april", "start": "10:30", "end": "11:00", "duration": 30, "category": "Finance & Accounts", "start_mins": 630, "end_mins": 660}, {"title": "Daat revised for ashima and Vivek bodyzone calling - pending leads", "start": "11:00", "end": "11:30", "duration": 30, "category": "Communication", "start_mins": 660, "end_mins": 690}, {"title": "ALL HOD's Meeting", "start": "11:35", "end": "12:00", "duration": 25, "category": "Meetings", "start_mins": 695, "end_mins": 720}, {"title": "SEO ranking ai agent completed", "start": "12:00", "end": "13:00", "duration": 60, "category": "Digital & Tech", "start_mins": 720, "end_mins": 780}, {"title": "Daily Meeting: SK and Heads-Bodyzone", "start": "12:50", "end": "13:20", "duration": 30, "category": "Meetings", "start_mins": 770, "end_mins": 800}, {"title": "Lunch Break", "start": "13:10", "end": "13:50", "duration": 40, "category": "Break", "start_mins": 790, "end_mins": 830}, {"title": "AI agent preparing for fb ad campaign - where it show high cost per lead alarm. show leads details ad wise , relevant, irrelevant, visit and order won - spa kora", "start": "14:00", "end": "17:00", "duration": 180, "category": "Digital & Tech", "start_mins": 840, "end_mins": 1020}, {"title": "Task marked in dashboard", "start": "17:00", "end": "17:30", "duration": 30, "category": "Reporting & Review", "start_mins": 1020, "end_mins": 1050}, {"title": "bips meeting", "start": "17:30", "end": "18:15", "duration": 45, "category": "Meetings", "start_mins": 1050, "end_mins": 1095}], "stats": {"total_tasks": 10, "work_tasks": 9, "work_hours": 8.2, "start_time": "09:30", "end_time": "18:15", "categories": {"Reporting & Review": 90, "Finance & Accounts": 30, "Communication": 30, "Meetings": 100, "Digital & Tech": 240, "Break": 40}}}}}, {"name": "Priyanka", "dates": {"2026-04-16": {"tasks": [{"title": "30 mins Offline forwarding audios from phone", "start": "09:45", "end": "10:15", "duration": 30, "category": "Communication", "start_mins": 585, "end_mins": 615}, {"title": "Updated VDTI Sheet", "start": "10:30", "end": "11:00", "duration": 30, "category": "Reporting & Review", "start_mins": 630, "end_mins": 660}, {"title": "Checked pending approvals and responses shared with Doers , tasks Delegated", "start": "10:30", "end": "11:15", "duration": 45, "category": "Communication", "start_mins": 630, "end_mins": 675}, {"title": "Updated Overdue Delegations in PPT and Organized ALL HOD's Meeting", "start": "11:15", "end": "12:00", "duration": 45, "category": "Meetings", "start_mins": 675, "end_mins": 720}, {"title": "Prepared Incentive letters for Amit Sir and Ms.Deepmala", "start": "12:00", "end": "12:30", "duration": 30, "category": "Reporting & Review", "start_mins": 720, "end_mins": 750}, {"title": "Updated Financial Reports and Organized Daily Meeting: SK and Heads-Bodyzone", "start": "12:30", "end": "13:15", "duration": 45, "category": "Meetings", "start_mins": 750, "end_mins": 795}, {"title": "Emailed Incentive plan to GM Sir", "start": "13:15", "end": "13:30", "duration": 15, "category": "Communication", "start_mins": 795, "end_mins": 810}, {"title": "Lunch", "start": "13:35", "end": "14:15", "duration": 40, "category": "Break", "start_mins": 815, "end_mins": 855}, {"title": "Updated To Do List", "start": "14:15", "end": "15:15", "duration": 60, "category": "Reporting & Review", "start_mins": 855, "end_mins": 915}, {"title": "Audit of completed Delegations for the Last Day.", "start": "15:30", "end": "16:00", "duration": 30, "category": "Reporting & Review", "start_mins": 930, "end_mins": 960}, {"title": "Coordination with Jasbir ji in Whatsapp Group for pending cases", "start": "16:00", "end": "16:30", "duration": 30, "category": "Communication", "start_mins": 960, "end_mins": 990}, {"title": "Updated VDTI Sheet", "start": "16:30", "end": "17:00", "duration": 30, "category": "Reporting & Review", "start_mins": 990, "end_mins": 1020}, {"title": "Coordination with Alok for payment of Joginder Gill ji", "start": "17:00", "end": "17:30", "duration": 30, "category": "General Work", "start_mins": 1020, "end_mins": 1050}, {"title": "Meeting- BIPS Global Mont. Event Planning", "start": "17:15", "end": "18:00", "duration": 45, "category": "Meetings", "start_mins": 1035, "end_mins": 1080}, {"title": "Checked MD Sir's email", "start": "17:30", "end": "18:00", "duration": 30, "category": "Communication", "start_mins": 1050, "end_mins": 1080}, {"title": "Delegation Tasks Marked , Calendar Shared, Carried Forward MD sir's TO Do List and Reminder set to Sir for Checking Pending Approvals", "start": "18:00", "end": "18:30", "duration": 30, "category": "Reporting & Review", "start_mins": 1080, "end_mins": 1110}], "stats": {"total_tasks": 16, "work_tasks": 15, "work_hours": 8.8, "start_time": "09:45", "end_time": "18:30", "categories": {"Communication": 150, "Reporting & Review": 210, "Meetings": 135, "Break": 40, "General Work": 30}}}}}, {"name": "Arun Sharma", "dates": {"2026-04-16": {"tasks": [{"title": "check whatsapp msg and mails regarding office work, renovation and construction", "start": "10:30", "end": "11:00", "duration": 30, "category": "Communication", "start_mins": 630, "end_mins": 660}, {"title": "ALL HOD's Meeting", "start": "11:35", "end": "12:00", "duration": 25, "category": "Meetings", "start_mins": 695, "end_mins": 720}, {"title": "Review Gurishjas Renovation Progress and BIPS construction", "start": "12:00", "end": "12:30", "duration": 30, "category": "Reporting & Review", "start_mins": 720, "end_mins": 750}], "stats": {"total_tasks": 3, "work_tasks": 3, "work_hours": 1.4, "start_time": "10:30", "end_time": "12:30", "categories": {"Communication": 30, "Meetings": 25, "Reporting & Review": 30}}}}}, {"name": "Boney", "dates": {"2026-04-16": {"tasks": [{"title": "Researched on the Alternatives of 11 labs", "start": "09:30", "end": "11:00", "duration": 90, "category": "General Work", "start_mins": 570, "end_mins": 660}, {"title": "updated PPT for both meetings", "start": "11:00", "end": "11:30", "duration": 30, "category": "Meetings", "start_mins": 660, "end_mins": 690}, {"title": "Morning Meeting", "start": "11:30", "end": "12:00", "duration": 30, "category": "Meetings", "start_mins": 690, "end_mins": 720}, {"title": "Camera Audit", "start": "12:00", "end": "12:30", "duration": 30, "category": "Reporting & Review", "start_mins": 720, "end_mins": 750}, {"title": "updated calling sheet", "start": "12:00", "end": "12:30", "duration": 30, "category": "Reporting & Review", "start_mins": 720, "end_mins": 750}, {"title": "Walkin Audit for BZ and SK", "start": "12:30", "end": "13:00", "duration": 30, "category": "Reporting & Review", "start_mins": 750, "end_mins": 780}, {"title": "SK BZ Meeting", "start": "12:50", "end": "13:30", "duration": 40, "category": "Meetings", "start_mins": 770, "end_mins": 810}, {"title": "Audited all 10 hoardings, and created FnF list for last month of hoardings", "start": "14:00", "end": "17:30", "duration": 210, "category": "Reporting & Review", "start_mins": 840, "end_mins": 1050}, {"title": "created 2 captions for BIPS, Shared CAll Audit report with CMD sir, worked on ways to created AI Sales Agent for BZ.", "start": "17:30", "end": "18:00", "duration": 30, "category": "Reporting & Review", "start_mins": 1050, "end_mins": 1080}, {"title": "Call Audit", "start": "18:00", "end": "18:30", "duration": 30, "category": "Reporting & Review", "start_mins": 1080, "end_mins": 1110}], "stats": {"total_tasks": 10, "work_tasks": 10, "work_hours": 9.2, "start_time": "09:30", "end_time": "18:30", "categories": {"General Work": 90, "Meetings": 100, "Reporting & Review": 360}}}}}, {"name": "Gunjan", "dates": {"2026-04-16": {"tasks": [{"title": "Leads posting, Leads entries (Bz, Spa kora, bips)", "start": "09:30", "end": "11:45", "duration": 135, "category": "Digital & Tech", "start_mins": 570, "end_mins": 705}, {"title": "Prepared daily leads report  and shared it vikram sir", "start": "11:30", "end": "11:45", "duration": 15, "category": "Reporting & Review", "start_mins": 690, "end_mins": 705}, {"title": "Updated Bz yesterday pending remarks.", "start": "11:45", "end": "12:30", "duration": 45, "category": "Reporting & Review", "start_mins": 705, "end_mins": 750}, {"title": "Updated today Gcs Ho and drivers   Attendance entry in google sheet", "start": "12:30", "end": "13:00", "duration": 30, "category": "Reporting & Review", "start_mins": 750, "end_mins": 780}, {"title": "Lunch time", "start": "13:10", "end": "13:50", "duration": 40, "category": "Break", "start_mins": 790, "end_mins": 830}, {"title": "Leads posting, Leads entries (Bz, Spa kora, Ght, Bips) Update remarks (Bodyzone), Whatsapp chatbot, Whatsapp sheets, Website leads", "start": "13:52", "end": "18:15", "duration": 263, "category": "Reporting & Review", "start_mins": 832, "end_mins": 1095}, {"title": "Shared pending leads of Bodyzone In bz whatsapp inquiry group", "start": "14:45", "end": "15:00", "duration": 15, "category": "Communication", "start_mins": 885, "end_mins": 900}, {"title": "Update direct walk-ins, Memberships form in crm (Bodyzone)", "start": "15:00", "end": "15:45", "duration": 45, "category": "Reporting & Review", "start_mins": 900, "end_mins": 945}, {"title": "Updated today's bips remarks, Shared by Ashima mam.", "start": "15:45", "end": "16:30", "duration": 45, "category": "Reporting & Review", "start_mins": 945, "end_mins": 990}, {"title": "Updated Bz today's remarks", "start": "16:30", "end": "17:15", "duration": 45, "category": "Reporting & Review", "start_mins": 990, "end_mins": 1035}, {"title": "Share the total count of Direct Walkin inquiries report with Amit sir. (Bodyzone", "start": "16:45", "end": "16:55", "duration": 10, "category": "Reporting & Review", "start_mins": 1005, "end_mins": 1015}, {"title": "Add all the links for all Delegation completed tasks, in another Google Sheet from the dashboard, Along with posting n remarks", "start": "17:15", "end": "18:15", "duration": 60, "category": "Reporting & Review", "start_mins": 1035, "end_mins": 1095}, {"title": "BodyzoneUpdated follow-ups remarks in crm ()", "start": "17:45", "end": "18:30", "duration": 45, "category": "Reporting & Review", "start_mins": 1065, "end_mins": 1110}, {"title": "Marked my checklist, Posting, Remarks", "start": "18:15", "end": "18:45", "duration": 30, "category": "Reporting & Review", "start_mins": 1095, "end_mins": 1125}, {"title": "Entered Survey Leads Data in Bips crm {Leads shared by Harjit sir}", "start": "19:45", "end": "20:30", "duration": 45, "category": "Communication", "start_mins": 1185, "end_mins": 1230}, {"title": "update job leads data in- Interviews google form- Head office Sheet { ForJob leads}", "start": "21:00", "end": "21:30", "duration": 30, "category": "Reporting & Review", "start_mins": 1260, "end_mins": 1290}, {"title": "Checked Facebook total leads received vs total leads entered in the CRM from last Saturday to till now (Bodyzone)", "start": "21:45", "end": "22:15", "duration": 30, "category": "General Work", "start_mins": 1305, "end_mins": 1335}, {"title": "Worked on today's out-of-city leads and updated them all in CRM", "start": "22:30", "end": "23:00", "duration": 30, "category": "Reporting & Review", "start_mins": 1350, "end_mins": 1380}], "stats": {"total_tasks": 18, "work_tasks": 17, "work_hours": 15.3, "start_time": "09:30", "end_time": "23:00", "categories": {"Digital & Tech": 135, "Reporting & Review": 693, "Break": 40, "Communication": 60, "General Work": 30}}}}}, {"name": "Ayush", "dates": {}}, {"name": "Diksha", "dates": {"2026-04-16": {"tasks": [{"title": "Daily HO meeting", "start": "11:35", "end": "12:00", "duration": 25, "category": "Meetings", "start_mins": 695, "end_mins": 720}, {"title": "Lunch Break", "start": "13:10", "end": "13:50", "duration": 40, "category": "Break", "start_mins": 790, "end_mins": 830}], "stats": {"total_tasks": 2, "work_tasks": 1, "work_hours": 0.4, "start_time": "11:35", "end_time": "13:50", "categories": {"Meetings": 25, "Break": 40}}}}}, {"name": "Santosh K", "dates": {"2026-04-16": {"tasks": [{"title": "Reviewed all the day’s tasks.", "start": "09:45", "end": "10:15", "duration": 30, "category": "Reporting & Review", "start_mins": 585, "end_mins": 615}, {"title": "Coordinate with Mr Manvinder and provide Passport of Jasnam", "start": "10:15", "end": "10:45", "duration": 30, "category": "Communication", "start_mins": 615, "end_mins": 645}, {"title": "Verified Jharkhand Salary", "start": "10:45", "end": "11:15", "duration": 30, "category": "Finance & Accounts", "start_mins": 645, "end_mins": 675}, {"title": "ALL HOD's Meeting", "start": "11:35", "end": "12:00", "duration": 25, "category": "Meetings", "start_mins": 695, "end_mins": 720}, {"title": "Review Gurishjas Renovation Progress and BIPS construction", "start": "12:00", "end": "12:30", "duration": 30, "category": "Reporting & Review", "start_mins": 720, "end_mins": 750}, {"title": "Coordinate with Harjeet ji and Deeksha", "start": "12:30", "end": "13:00", "duration": 30, "category": "Communication", "start_mins": 750, "end_mins": 780}, {"title": "Lunch", "start": "13:15", "end": "14:00", "duration": 45, "category": "Break", "start_mins": 795, "end_mins": 840}, {"title": "Filter CVs for Fitness Couselor", "start": "14:00", "end": "15:15", "duration": 75, "category": "General Work", "start_mins": 840, "end_mins": 915}, {"title": "HR Operation work", "start": "15:15", "end": "16:00", "duration": 45, "category": "General Work", "start_mins": 915, "end_mins": 960}, {"title": "Coordinate with Ultra Tech cement vendor for purchase", "start": "16:00", "end": "16:30", "duration": 30, "category": "Communication", "start_mins": 960, "end_mins": 990}, {"title": "Entries in  exist form of employees", "start": "16:30", "end": "17:15", "duration": 45, "category": "General Work", "start_mins": 990, "end_mins": 1035}, {"title": "Coordinated with Mr Vikram for creative of Floor manager", "start": "17:15", "end": "17:45", "duration": 30, "category": "Communication", "start_mins": 1035, "end_mins": 1065}, {"title": "marked delegation and checklist", "start": "17:45", "end": "18:15", "duration": 30, "category": "Reporting & Review", "start_mins": 1065, "end_mins": 1095}], "stats": {"total_tasks": 13, "work_tasks": 12, "work_hours": 7.2, "start_time": "09:45", "end_time": "18:15", "categories": {"Reporting & Review": 90, "Communication": 120, "Finance & Accounts": 30, "Meetings": 25, "Break": 45, "General Work": 165}}}}}, {"name": "Devinder", "dates": {"2026-04-16": {"tasks": [{"title": "Website enquries check And post in relevant group", "start": "09:15", "end": "09:45", "duration": 30, "category": "Digital & Tech", "start_mins": 555, "end_mins": 585}, {"title": "Social media postings All verticles", "start": "09:45", "end": "11:15", "duration": 90, "category": "Digital & Tech", "start_mins": 585, "end_mins": 675}, {"title": "Revert on Facebook Comments", "start": "11:15", "end": "11:30", "duration": 15, "category": "Communication", "start_mins": 675, "end_mins": 690}, {"title": "ALL HOD's Meeting", "start": "11:35", "end": "12:00", "duration": 25, "category": "Meetings", "start_mins": 695, "end_mins": 720}, {"title": "podcast submission  Bips patiala", "start": "12:00", "end": "13:00", "duration": 60, "category": "Digital & Tech", "start_mins": 720, "end_mins": 780}, {"title": "Lunch Time", "start": "13:11", "end": "13:50", "duration": 39, "category": "Break", "start_mins": 791, "end_mins": 830}, {"title": "Add BIPS Descriptions in 69 Blogs", "start": "14:00", "end": "14:45", "duration": 45, "category": "Digital & Tech", "start_mins": 840, "end_mins": 885}, {"title": "Reviews Revert for all verticles", "start": "14:45", "end": "15:00", "duration": 15, "category": "Reporting & Review", "start_mins": 885, "end_mins": 900}, {"title": "Redirection from old Links to new links", "start": "15:00", "end": "17:00", "duration": 120, "category": "General Work", "start_mins": 900, "end_mins": 1020}, {"title": "BIPS & ABC meeting", "start": "17:00", "end": "17:45", "duration": 45, "category": "Meetings", "start_mins": 1020, "end_mins": 1065}, {"title": "Mark Check list", "start": "17:45", "end": "18:15", "duration": 30, "category": "Reporting & Review", "start_mins": 1065, "end_mins": 1095}], "stats": {"total_tasks": 11, "work_tasks": 10, "work_hours": 7.9, "start_time": "09:15", "end_time": "18:15", "categories": {"Digital & Tech": 225, "Communication": 15, "Meetings": 70, "Break": 39, "Reporting & Review": 45, "General Work": 120}}}}}, {"name": "Alok", "dates": {"2026-04-16": {"tasks": [{"title": "visit bdz and preparedbdz  and spa kora regsiter", "start": "09:00", "end": "10:00", "duration": 60, "category": "Reporting & Review", "start_mins": 540, "end_mins": 600}, {"title": "auidt done of bdz and spa kora sale s", "start": "10:00", "end": "11:00", "duration": 60, "category": "General Work", "start_mins": 600, "end_mins": 660}, {"title": "sales heet update dof bdz and spa kora", "start": "11:00", "end": "12:00", "duration": 60, "category": "Reporting & Review", "start_mins": 660, "end_mins": 720}, {"title": "sales entry made in tally of bdz and spa kora", "start": "12:00", "end": "13:00", "duration": 60, "category": "Finance & Accounts", "start_mins": 720, "end_mins": 780}, {"title": "Daily Meeting: SK and Heads-Bodyzone", "start": "12:50", "end": "13:20", "duration": 30, "category": "Meetings", "start_mins": 770, "end_mins": 800}, {"title": "lunch time", "start": "13:00", "end": "14:00", "duration": 60, "category": "Break", "start_mins": 780, "end_mins": 840}, {"title": "susepnse entry cleard of bdz", "start": "14:00", "end": "15:00", "duration": 60, "category": "Reporting & Review", "start_mins": 840, "end_mins": 900}, {"title": "suspense entry cleared of spa sales", "start": "15:00", "end": "16:00", "duration": 60, "category": "Finance & Accounts", "start_mins": 900, "end_mins": 960}, {"title": "bdz and spa kora 2 year finnacial reprot proeared and shared with md sir in the group", "start": "16:00", "end": "17:00", "duration": 60, "category": "Communication", "start_mins": 960, "end_mins": 1020}, {"title": "all task which is pending in my deligation remarks shared in the an write reason why they are pending and task mark calendar prepared", "start": "17:00", "end": "18:00", "duration": 60, "category": "Reporting & Review", "start_mins": 1020, "end_mins": 1080}], "stats": {"total_tasks": 10, "work_tasks": 9, "work_hours": 8.5, "start_time": "09:00", "end_time": "18:00", "categories": {"Reporting & Review": 240, "General Work": 60, "Finance & Accounts": 120, "Meetings": 30, "Break": 60, "Communication": 60}}}}}, {"name": "Rohit", "dates": {"2026-04-16": {"tasks": [{"title": "BANK UPDATE & RECO. IN BOOKS", "start": "09:00", "end": "10:00", "duration": 60, "category": "Finance & Accounts", "start_mins": 540, "end_mins": 600}, {"title": "UPDATE ALL BNK IN TALLY OF SOCIETY & BIPS", "start": "10:00", "end": "11:30", "duration": 90, "category": "Finance & Accounts", "start_mins": 600, "end_mins": 690}, {"title": "HOD MEETING", "start": "11:30", "end": "12:00", "duration": 30, "category": "Meetings", "start_mins": 690, "end_mins": 720}, {"title": "RECO IF BANK BIPS", "start": "12:00", "end": "13:00", "duration": 60, "category": "Finance & Accounts", "start_mins": 720, "end_mins": 780}, {"title": "LUNCH BREAK", "start": "13:10", "end": "13:50", "duration": 40, "category": "Break", "start_mins": 790, "end_mins": 830}, {"title": "FILLING OF BILLS & PO OF BIPS & SOCIETY", "start": "14:00", "end": "15:00", "duration": 60, "category": "Finance & Accounts", "start_mins": 840, "end_mins": 900}, {"title": "RECO SCHOOL PAD 2026-27", "start": "15:00", "end": "16:30", "duration": 90, "category": "Finance & Accounts", "start_mins": 900, "end_mins": 990}, {"title": "UPDATE SHEET Accounts Team BluePrint", "start": "16:30", "end": "17:30", "duration": 60, "category": "Break", "start_mins": 990, "end_mins": 1050}, {"title": "MARKING CHECKLIST", "start": "17:30", "end": "18:00", "duration": 30, "category": "Reporting & Review", "start_mins": 1050, "end_mins": 1080}], "stats": {"total_tasks": 9, "work_tasks": 7, "work_hours": 7.0, "start_time": "09:00", "end_time": "18:00", "categories": {"Finance & Accounts": 360, "Meetings": 30, "Break": 100, "Reporting & Review": 30}}}}}];
-const ALL_DATES   = ["2026-04-16"];
-const CAT_COLORS  = {"Meetings": "#5c6bc0", "Break": "#90a4ae", "Leave": "#e57373", "Reporting & Review": "#00897b", "Communication": "#ef6c00", "Digital & Tech": "#0288d1", "Finance & Accounts": "#388e3c", "Operations": "#f57c00", "General Work": "#8e24aa"};
-const EMP_COLORS  = ["#5c6bc0", "#00897b", "#ef6c00", "#0288d1", "#388e3c", "#8e24aa", "#f57c00", "#d32f2f", "#0097a7", "#7b1fa2", "#c62828", "#2e7d32"];
-
-// ── FORMAT HELPERS ───────────────────────────────────────────────────────────
-function fmtHrs(hrs) {
-  // convert decimal hours → "Xh Ym"
-  const totalMins = Math.round(hrs * 60);
-  const h = Math.floor(totalMins / 60);
-  const m = totalMins % 60;
-  if (h === 0) return m + 'm';
-  if (m === 0) return h + 'h';
-  return h + 'h ' + m + 'm';
-}
-function fmtDate(iso) {
-  // YYYY-MM-DD → DD/MM
-  const parts = iso.slice(5).split('-');
-  return parts[1] + '/' + parts[0];
-}
-
-// ── DATE HELPERS ─────────────────────────────────────────────────────────────
-function today()     { return new Date().toISOString().slice(0,10); }
-function yesterday() {
-  const d = new Date(); d.setDate(d.getDate()-1);
-  return d.toISOString().slice(0,10);
-}
-function weekStart() {
-  const d = new Date();
-  d.setDate(d.getDate() - d.getDay() + (d.getDay()===0?-6:1));
-  return d.toISOString().slice(0,10);
-}
-function monthStart() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
-}
-
-function setPreset(type, btn) {
-  document.querySelectorAll('.quick-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const t = today(), y = yesterday();
-  if (type==='yesterday') { document.getElementById('fromDate').value=y; document.getElementById('toDate').value=y; }
-  if (type==='today')     { document.getElementById('fromDate').value=t; document.getElementById('toDate').value=t; }
-  if (type==='week')      { document.getElementById('fromDate').value=weekStart(); document.getElementById('toDate').value=t; }
-  if (type==='month')     { document.getElementById('fromDate').value=monthStart(); document.getElementById('toDate').value=t; }
-  applyFilter();
-}
-
-// ── FILTER LOGIC ─────────────────────────────────────────────────────────────
-function getDatesInRange(from, to) {
-  return ALL_DATES.filter(d => d >= from && d <= to);
-}
-
-function mergeTasksForRange(empDates, from, to) {
-  const merged = [];
-  const inRange = getDatesInRange(from, to);
-  for (const d of inRange) {
-    if (empDates[d]) merged.push(...empDates[d].tasks);
-  }
-  return merged;
-}
-
-function calcStats(tasks) {
-  const NON_WORK = ['Break', 'Leave'];
-  const work = tasks.filter(t => !NON_WORK.includes(t.category));
-  const cats = {};
-  tasks.forEach(t => cats[t.category] = (cats[t.category]||0) + t.duration);
-  return {
-    total_tasks: tasks.length,
-    work_tasks:  work.length,
-    work_hours:  Math.round(work.reduce((a,t)=>a+t.duration,0)/60*10)/10,
-    start_time:  tasks.length ? tasks.map(t=>t.start).sort()[0]   : 'N/A',
-    end_time:    tasks.length ? tasks.map(t=>t.end).sort().pop()   : 'N/A',
-    categories:  cats,
-  };
-}
-
-// ── RENDER ───────────────────────────────────────────────────────────────────
-function generateInsights(stats) {
-  const ins = [];
-  if (stats.work_hours>=7)       ins.push(['✅',`Excellent — ${fmtHrs(stats.work_hours)} of productive work`]);
-  else if (stats.work_hours>=5)  ins.push(['👍',`Good effort — ${fmtHrs(stats.work_hours)} of work logged`]);
-  else if (stats.work_hours>0)   ins.push(['⚠️',`Low activity — only ${fmtHrs(stats.work_hours)} logged`]);
-  else                           ins.push(['❌','No work activities recorded']);
-  const workCats = Object.fromEntries(Object.entries(stats.categories).filter(([k])=>!['Break','Leave'].includes(k)));
-  if (Object.keys(workCats).length) {
-    const top = Object.entries(workCats).sort((a,b)=>b[1]-a[1])[0];
-    const total = Object.values(workCats).reduce((a,b)=>a+b,0);
-    ins.push(['🎯',`Primary focus: ${top[0]} (${Math.round(top[1]/total*100)}% of work time)`]);
-  }
-  const mtg = stats.categories['Meetings']||0;
-  if (mtg>90) ins.push(['📅',`High meeting load: ${Math.round(mtg)} mins`]);
-  if (stats.start_time!=='N/A' && parseInt(stats.start_time)<10) ins.push(['🌅','Early start — punctual and proactive']);
-  return ins;
-}
-
-function renderCard(emp, idx, from, to) {
-  const color = EMP_COLORS[idx % EMP_COLORS.length];
-  const initials = emp.name.split(' ').slice(0,2).map(p=>p[0].toUpperCase()).join('');
-
-  const empDates = emp.dates||{};
-  const allTasks = mergeTasksForRange(empDates, from, to);
-
-  if (!allTasks.length) {
-    return `<div class="emp-card no-data" data-name="${emp.name}">
-      <div class="card-header" style="background:${color}15;border-left:4px solid ${color}">
-        <div class="avatar" style="background:${color}">${initials}</div>
-        <div class="emp-info"><h3>${emp.name}</h3><div class="emp-meta"><span class="badge grey">No activity</span></div></div>
-      </div>
-      <div class="no-data-msg">📭 No calendar events for selected period</div>
-    </div>`;
-  }
-
-  const stats = calcStats(allTasks);
-  const insights = generateInsights(stats);
-  const stars = '★'.repeat(Math.min(5,Math.max(1,Math.round(stats.work_hours/8*5)))) + '☆'.repeat(5-Math.min(5,Math.max(1,Math.round(stats.work_hours/8*5))));
-
-  // Work category tags (exclude Break and Leave)
-  const NON_WORK = ['Break', 'Leave'];
-  const workCats = Object.entries(stats.categories).filter(([k])=>!NON_WORK.includes(k)).sort((a,b)=>b[1]-a[1]);
-  const catTags = workCats.map(([k,v]) => {
-    const clr = CAT_COLORS[k]||'#999';
-    return `<span class="cat-tag" style="background:${clr}22;color:${clr};border:1px solid ${clr}55">${k} · ${fmtHrs(v/60)}</span>`;
-  }).join('');
-
-  // Break and Leave as separate tags
-  const breakMins = stats.categories['Break']||0;
-  const leaveMins = stats.categories['Leave']||0;
-  const breakHrs  = Math.round(breakMins/60*10)/10;
-  const leaveHrs  = Math.round(leaveMins/60*10)/10;
-  let breakLeaveTag = '';
-  if (breakMins > 0 || leaveMins > 0) {
-    breakLeaveTag = `<span class="cat-section-label">⏸ Breaks & Leave</span>`;
-    if (breakMins > 0) breakLeaveTag += `<span class="cat-tag" style="background:#90a4ae22;color:#546e7a;border:1px solid #90a4ae55">☕ Break · ${fmtHrs(breakHrs)}</span>`;
-    if (leaveMins > 0) breakLeaveTag += `<span class="cat-tag" style="background:#e5737322;color:#c62828;border:1px solid #e5737355">🏖 Leave · ${fmtHrs(leaveHrs)}</span>`;
-  }
-
-  // Hours summary bar
-  const STD = 9;
-  const actualWork = stats.work_hours;
-  const totalNonWork = Math.round((breakMins + leaveMins)/60*10)/10;
-  const diff = Math.round((actualWork - STD)*10)/10;
-  const isOver = diff >= 0;
-  const hoursBar = `
-  <div class="hours-bar">
-    <div class="hrs-item hrs-neutral">
-      <span class="hrs-val">${fmtHrs(STD)}</span>
-      <span class="hrs-lbl">Standard</span>
-    </div>
-    <span class="hrs-sep">−</span>
-    <div class="hrs-item" style="background:#90a4ae22;color:#546e7a">
-      <span class="hrs-val">☕ ${fmtHrs(breakHrs)}</span>
-      <span class="hrs-lbl">Break</span>
-    </div>
-    ${leaveMins>0 ? `<div class="hrs-item" style="background:#e5737322;color:#c62828"><span class="hrs-val">🏖 ${fmtHrs(leaveHrs)}</span><span class="hrs-lbl">Leave</span></div>` : ''}
-    <span class="hrs-sep">=</span>
-    <div class="hrs-item hrs-neutral">
-      <span class="hrs-val">${fmtHrs(actualWork)}</span>
-      <span class="hrs-lbl">Actual Work</span>
-    </div>
-    <div class="hrs-item ${isOver?'hrs-ok':'hrs-gap'}" style="margin-left:8px">
-      <span class="hrs-val">${isOver?'🟢':'🔴'} ${fmtHrs(Math.abs(diff))}</span>
-      <span class="hrs-lbl">${isOver?'Overtime':'Gap'}</span>
-    </div>
-  </div>`;
-
-  // Task list
-  const taskRows = allTasks.sort((a,b)=>a.start.localeCompare(b.start)).map(t => {
-    const clr = CAT_COLORS[t.category]||'#999';
-    const dur = fmtHrs(t.duration/60);
-    return `<div class="task-row">
-      <span class="task-dot" style="background:${clr}"></span>
-      <div class="task-content">
-        <span class="task-time">${t.start} – ${t.end}</span>
-        <span class="task-title">${t.title}</span>
-      </div>
-      <span class="task-dur">${dur}</span>
-    </div>`;
-  }).join('');
-
-  const insightRows = insights.map(([ic,tx])=>
-    `<div class="insight-item"><span>${ic}</span><span>${tx}</span></div>`
-  ).join('');
-
-  const cid = `c${idx}`;
-  return `<div class="emp-card" data-name="${emp.name}" id="${cid}">
-    <div class="card-header" style="background:${color}15;border-left:4px solid ${color}">
-      <div class="avatar" style="background:${color}">${initials}</div>
-      <div class="emp-info">
-        <h3>${emp.name}</h3>
-        <div class="emp-meta">
-          <span class="badge" style="background:${color}22;color:${color}">${stats.work_tasks} tasks</span>
-          <span class="badge" style="background:${color}22;color:${color}">${fmtHrs(stats.work_hours)} work</span>
-          <span class="stars">${stars}</span>
-        </div>
-        <div class="emp-time">🕐 ${stats.start_time} – ${stats.end_time}</div>
-      </div>
-    </div>
-
-    ${hoursBar}
-    <div class="cat-legend">
-      <span class="cat-section-label">💼 Work Categories</span>
-      ${catTags}${breakLeaveTag}
-    </div>
-
-    <div class="card-tabs">
-      <button class="tab-btn active" onclick="switchTab(this,'${cid}-tasks')">📋 Tasks</button>
-      <button class="tab-btn" onclick="switchTab(this,'${cid}-insights')">💡 Analysis</button>
-    </div>
-    <div class="tab-pane active" id="${cid}-tasks"><div class="task-list">${taskRows}</div></div>
-    <div class="tab-pane" id="${cid}-insights"><div class="insights-box">${insightRows}</div></div>
-  </div>`;
-}
-
-function renderAll(from, to) {
-  const grid = document.getElementById('grid');
-  let html = '';
-  let active=0, totalWh=0;
-
-  ALL_DATA.forEach((emp,i) => {
-    const empDates = emp.dates||{};
-    const tasks = mergeTasksForRange(empDates, from, to);
-    if (tasks.length) { active++; totalWh += calcStats(tasks).work_hours; }
-    html += renderCard(emp, i, from, to);
-  });
-
-  grid.innerHTML = html || '<div class="empty-state"><div>📭</div><p>No data for selected period</p></div>';
-
-  // Update header stats
-  document.getElementById('hd-members').textContent = ALL_DATA.length;
-  document.getElementById('hd-active').textContent   = active;
-  document.getElementById('hd-avghrs').textContent   = active ? fmtHrs(totalWh/active) : '—';
-  document.getElementById('hd-date').textContent     = from===to ? fmtDate(from) : fmtDate(from)+'–'+fmtDate(to);
-}
-
-function applyFilter() {
-  const from = document.getElementById('fromDate').value;
-  const to   = document.getElementById('toDate').value;
-  if (!from || !to) return;
-  renderAll(from, to);
-}
-
-function switchTab(btn, paneId) {
-  const card = btn.closest('.emp-card');
-  card.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  card.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById(paneId).classList.add('active');
-}
-
-function searchCards(q) {
-  q = q.toLowerCase().trim();
-  document.querySelectorAll('.emp-card').forEach(c => {
-    const name = (c.dataset.name||'').toLowerCase();
-    c.style.display = (!q || name.includes(q)) ? '' : 'none';
+function filterByDate() {
+  const val = document.getElementById('dateFilter').value;
+  document.querySelectorAll('.emp-card').forEach(card => {
+    if (val === 'all') {
+      card.classList.remove('hidden');
+      card.querySelectorAll('.date-group').forEach(dg => dg.style.display = '');
+    } else {
+      card.querySelectorAll('.date-group').forEach(dg => {
+        dg.style.display = dg.dataset.date === val ? '' : 'none';
+      });
+      const visible = card.querySelectorAll('.date-group[style=""],.date-group:not([style])');
+      const anyVisible = [...card.querySelectorAll('.date-group')].some(dg => dg.style.display !== 'none');
+      card.classList.toggle('hidden', !anyVisible);
+    }
   });
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-(function init() {
-  const latestDate = ALL_DATES.length ? ALL_DATES[ALL_DATES.length-1] : today();
-  document.getElementById('fromDate').value = latestDate;
-  document.getElementById('toDate').value   = latestDate;
-  renderAll(latestDate, latestDate);
-})();
+function filterSearch() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  document.querySelectorAll('.emp-card').forEach(card => {
+    const emp = card.dataset.emp.toLowerCase();
+    const tasks = card.innerText.toLowerCase();
+    card.classList.toggle('hidden', q.length > 0 && !emp.includes(q) && !tasks.includes(q));
+  });
+}
+
+function resetFilters() {
+  document.getElementById('dateFilter').value = 'all';
+  document.getElementById('searchBox').value = '';
+  document.querySelectorAll('.emp-card').forEach(card => {
+    card.classList.remove('hidden');
+    card.querySelectorAll('.date-group').forEach(dg => dg.style.display = '');
+  });
+}
 </script>
 </body>
 </html>
