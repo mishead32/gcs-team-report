@@ -2,183 +2,1052 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GCS Team Daily Report</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-  header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1px solid #334155; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-  .logo { display: flex; align-items: center; gap: 12px; }
-  .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-  .logo-text h1 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; }
-  .logo-text p { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
-  .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .live-badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
-  .live-badge::before { content: ''; width: 7px; height: 7px; background: white; border-radius: 50%; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .date-selector { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; outline: none; }
-  .date-selector:focus { border-color: #6366f1; }
-  .stats-bar { background: #1e293b; border-bottom: 1px solid #334155; padding: 16px 32px; display: flex; gap: 32px; overflow-x: auto; }
-  .stat { text-align: center; min-width: 80px; }
-  .stat-num { font-size: 1.8rem; font-weight: 800; color: #6366f1; line-height: 1; }
-  .stat-label { font-size: 0.72rem; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .main { padding: 28px 32px; }
-  .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-  .section-title::after { content: ''; flex: 1; height: 1px; background: #334155; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-  .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-  .card-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
-  .avatar { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; color: white; flex-shrink: 0; }
-  .card-name { font-weight: 700; font-size: 1rem; color: #f1f5f9; }
-  .card-count { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
-  .card-body { padding: 16px 20px; max-height: 320px; overflow-y: auto; }
-  .card-body::-webkit-scrollbar { width: 4px; }
-  .card-body::-webkit-scrollbar-track { background: transparent; }
-  .card-body::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
-  .task-item { padding: 10px 0; border-bottom: 1px solid #334155; }
-  .task-item:last-child { border-bottom: none; }
-  .task-time { font-size: 0.72rem; color: #64748b; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-  .task-time-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .task-title { font-size: 0.85rem; color: #cbd5e1; line-height: 1.4; }
-  .task-desc { font-size: 0.78rem; color: #64748b; margin-top: 4px; font-style: italic; }
-  .no-tasks { text-align: center; padding: 32px 16px; color: #475569; font-size: 0.85rem; }
-  .no-tasks-icon { font-size: 2rem; margin-bottom: 8px; }
-  .insights { background: linear-gradient(135deg, #1e1b4b, #1e293b); border: 1px solid #4338ca; border-radius: 16px; padding: 24px; margin-bottom: 28px; }
-  .insights h3 { color: #a5b4fc; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-  .insights-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-  .insight-item { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 12px 16px; }
-  .insight-label { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-  .insight-value { font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-top: 4px; }
-  .insight-sub { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
-  footer { text-align: center; padding: 24px; color: #475569; font-size: 0.78rem; border-top: 1px solid #334155; margin-top: 20px; }
-  .update-time { color: #64748b; font-size: 0.78rem; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#020617;color:#e2e8f0;min-height:100vh}
+  .header{background:linear-gradient(135deg,#0f172a,#1e1b4b);border-bottom:1px solid #1e293b;padding:20px 32px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;padding:24px 32px}
+  .stat-card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:16px 20px}
+  .emp-card.hidden{display:none!important}
+  .date-section.filtered-hidden{display:none!important}
+  button.date-btn:hover{background:#334155;color:#e2e8f0;border-color:#4f46e5}
+  button.date-btn.active{background:#4f46e5;color:#fff;border-color:#6366f1}
+  @media(max-width:768px){.grid{grid-template-columns:1fr;padding:16px}}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">
-    <div class="logo-icon">📋</div>
-    <div class="logo-text">
-      <h1>GCS Team Daily Report</h1>
-      <p>Global Cloud Solutions • Live Dashboard</p>
+<div class="header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:800;color:#f1f5f9;letter-spacing:-0.02em">🏢 GCS Team Daily Report</div>
+      <div style="font-size:13px;color:#64748b;margin-top:4px">Generated: 25/4/2026, 1:11:09 pm IST · Data up to 24/04/2026</div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div class="stat-card" style="text-align:center;min-width:100px">
+        <div style="font-size:28px;font-weight:800;color:#6366f1">168</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em">Total Tasks</div>
+      </div>
+      <div class="stat-card" style="text-align:center;min-width:100px">
+        <div style="font-size:28px;font-weight:800;color:#14b8a6">6</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em">Active Members</div>
+      </div>
+      <div class="stat-card" style="text-align:center;min-width:100px">
+        <div style="font-size:28px;font-weight:800;color:#f59e0b">18</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em">Latest Day</div>
+      </div>
     </div>
   </div>
-  <div class="header-right">
-    <div class="live-badge">LIVE</div>
-    <select class="date-selector" id="dateSelect" onchange="renderForDate(this.value)">
-      <option value="2026-04-23" selected>Thu, 23 Apr, 2026</option><option value="2026-04-22">Wed, 22 Apr, 2026</option><option value="2026-04-21">Tue, 21 Apr, 2026</option><option value="2026-04-20">Mon, 20 Apr, 2026</option><option value="2026-04-19">Sun, 19 Apr, 2026</option><option value="2026-04-18">Sat, 18 Apr, 2026</option><option value="2026-04-17">Fri, 17 Apr, 2026</option><option value="2026-04-16">Thu, 16 Apr, 2026</option>
-    </select>
-    <span class="update-time" id="updateTime"></span>
+  
+  <!-- Date Filters -->
+  <div style="margin-top:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Filter:</span>
+    <button onclick="filterDate('all')" id="btn-all" class="date-btn active" style="background:#4f46e5;color:#fff;border:1px solid #6366f1;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer">All Dates</button>
+    <button onclick="filterDate('16/04/2026')" class="date-btn" id="btn-16-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">16/04/2026</button><button onclick="filterDate('17/04/2026')" class="date-btn" id="btn-17-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">17/04/2026</button><button onclick="filterDate('18/04/2026')" class="date-btn" id="btn-18-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">18/04/2026</button><button onclick="filterDate('21/04/2026')" class="date-btn" id="btn-21-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">21/04/2026</button><button onclick="filterDate('22/04/2026')" class="date-btn" id="btn-22-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">22/04/2026</button><button onclick="filterDate('23/04/2026')" class="date-btn" id="btn-23-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">23/04/2026</button><button onclick="filterDate('24/04/2026')" class="date-btn" id="btn-24-04-2026" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;transition:all 0.2s">24/04/2026</button>
   </div>
-</header>
-
-<div class="stats-bar" id="statsBar">
-  <div class="stat"><div class="stat-num" id="statTeam">12</div><div class="stat-label">Team Members</div></div>
-  <div class="stat"><div class="stat-num" id="statActive">0</div><div class="stat-label">Active Today</div></div>
-  <div class="stat"><div class="stat-num" id="statTasks">0</div><div class="stat-label">Total Tasks</div></div>
-  <div class="stat"><div class="stat-num" id="statAvg">0</div><div class="stat-label">Avg Tasks/Person</div></div>
-  <div class="stat"><div class="stat-num" id="statBusiest">—</div><div class="stat-label">Most Active</div></div>
 </div>
 
-<div class="main">
-  <div class="insights" id="insightsSection"></div>
-  <div class="section-title" id="gridTitle">👥 Team Activity</div>
-  <div class="grid" id="teamGrid"></div>
+<div class="grid" id="empGrid">
+<div class="emp-card" data-emp="Mehak" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#6366f122,#6366f111);border-bottom:1px solid #6366f133;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">M</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Mehak</div>
+          <div style="font-size:12px;color:#6366f1;margin-top:2px">28 tasks · 7 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#6366f122;color:#6366f1;border:1px solid #6366f144;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">✓ 3 today</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div class="date-section date-16-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">16/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 09:15:00 – 10:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:00:00 – 10:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:30:00 – 11:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Follow Up for Cancellations & Refusals</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:00:00 – 11:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Attended HOD'S Daily morning meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:35:00 – 11:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting SK & BZ</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:50:00 – 13:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">LUNCH BREAK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:10:00 – 13:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Half day leave</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-17-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">17/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CL Audit</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 15:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CALL AUDIT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:00:00 – 16:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 16:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM OF BZ AND SK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:00:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Post reminders for pending tasks</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Announcing the winner of back to back therapies</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 17:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Marking Checklist & Delegation</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:30:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Sending callers report to MD sir</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 18:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-18-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">18/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and GHT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-21-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">21/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">BZ Trainers Weekly Review+EM (enitre operations)</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Bodyzone Sales Review +EM</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 14:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-22-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">22/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordinatin</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:15:00 – 15:45:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update in sheet</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-23-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">23/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Off linne follow upsa and co ordinations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 17:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-24-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">24/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Review Gurishjas Renovation Progress and BIPS construction</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 12:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting: SK and Heads-Bodyzone</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 13:36:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #6366f1;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:30:00 – 15:15:00</div>
+          
+        </div>
+      </div>
+      </div>
+    </div><div class="emp-card" data-emp="Rajinder" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#ec489922,#ec489911);border-bottom:1px solid #ec489933;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#ec4899;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">R</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Rajinder</div>
+          <div style="font-size:12px;color:#ec4899;margin-top:2px">28 tasks · 7 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#ec489922;color:#ec4899;border:1px solid #ec489944;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">✓ 3 today</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div class="date-section date-16-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">16/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 09:15:00 – 10:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:00:00 – 10:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:30:00 – 11:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Follow Up for Cancellations & Refusals</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:00:00 – 11:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Attended HOD'S Daily morning meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:35:00 – 11:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting SK & BZ</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:50:00 – 13:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">LUNCH BREAK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:10:00 – 13:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Half day leave</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-17-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">17/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CL Audit</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 15:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CALL AUDIT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:00:00 – 16:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 16:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM OF BZ AND SK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:00:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Post reminders for pending tasks</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Announcing the winner of back to back therapies</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 17:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Marking Checklist & Delegation</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:30:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Sending callers report to MD sir</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 18:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-18-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">18/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and GHT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-21-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">21/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">BZ Trainers Weekly Review+EM (enitre operations)</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Bodyzone Sales Review +EM</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 14:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-22-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">22/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordinatin</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:15:00 – 15:45:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update in sheet</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-23-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">23/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Off linne follow upsa and co ordinations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 17:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-24-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">24/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Review Gurishjas Renovation Progress and BIPS construction</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 12:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting: SK and Heads-Bodyzone</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 13:36:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #ec4899;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:30:00 – 15:15:00</div>
+          
+        </div>
+      </div>
+      </div>
+    </div><div class="emp-card" data-emp="Priyanka" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#14b8a622,#14b8a611);border-bottom:1px solid #14b8a633;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#14b8a6;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">P</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Priyanka</div>
+          <div style="font-size:12px;color:#14b8a6;margin-top:2px">28 tasks · 7 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#14b8a622;color:#14b8a6;border:1px solid #14b8a644;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">✓ 3 today</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div class="date-section date-16-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">16/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 09:15:00 – 10:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:00:00 – 10:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:30:00 – 11:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Follow Up for Cancellations & Refusals</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:00:00 – 11:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Attended HOD'S Daily morning meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:35:00 – 11:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting SK & BZ</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:50:00 – 13:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">LUNCH BREAK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:10:00 – 13:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Half day leave</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-17-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">17/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CL Audit</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 15:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CALL AUDIT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:00:00 – 16:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 16:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM OF BZ AND SK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:00:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Post reminders for pending tasks</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Announcing the winner of back to back therapies</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 17:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Marking Checklist & Delegation</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:30:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Sending callers report to MD sir</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 18:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-18-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">18/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and GHT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-21-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">21/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">BZ Trainers Weekly Review+EM (enitre operations)</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Bodyzone Sales Review +EM</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 14:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-22-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">22/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordinatin</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:15:00 – 15:45:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update in sheet</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-23-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">23/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Off linne follow upsa and co ordinations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 17:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-24-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">24/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Review Gurishjas Renovation Progress and BIPS construction</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 12:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting: SK and Heads-Bodyzone</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 13:36:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #14b8a6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:30:00 – 15:15:00</div>
+          
+        </div>
+      </div>
+      </div>
+    </div><div class="emp-card" data-emp="Arun Sharma" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#f59e0b22,#f59e0b11);border-bottom:1px solid #f59e0b33;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">A</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Arun Sharma</div>
+          <div style="font-size:12px;color:#f59e0b;margin-top:2px">28 tasks · 7 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">✓ 3 today</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div class="date-section date-16-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">16/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 09:15:00 – 10:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:00:00 – 10:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:30:00 – 11:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Follow Up for Cancellations & Refusals</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:00:00 – 11:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Attended HOD'S Daily morning meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:35:00 – 11:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting SK & BZ</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:50:00 – 13:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">LUNCH BREAK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:10:00 – 13:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Half day leave</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-17-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">17/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CL Audit</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 15:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CALL AUDIT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:00:00 – 16:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 16:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM OF BZ AND SK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:00:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Post reminders for pending tasks</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Announcing the winner of back to back therapies</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 17:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Marking Checklist & Delegation</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:30:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Sending callers report to MD sir</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 18:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-18-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">18/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and GHT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-21-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">21/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">BZ Trainers Weekly Review+EM (enitre operations)</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Bodyzone Sales Review +EM</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 14:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-22-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">22/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordinatin</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:15:00 – 15:45:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update in sheet</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-23-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">23/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Off linne follow upsa and co ordinations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 17:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-24-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">24/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Review Gurishjas Renovation Progress and BIPS construction</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 12:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting: SK and Heads-Bodyzone</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 13:36:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:30:00 – 15:15:00</div>
+          
+        </div>
+      </div>
+      </div>
+    </div><div class="emp-card" data-emp="Boney" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#8b5cf622,#8b5cf611);border-bottom:1px solid #8b5cf633;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#8b5cf6;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">B</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Boney</div>
+          <div style="font-size:12px;color:#8b5cf6;margin-top:2px">28 tasks · 7 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">✓ 3 today</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div class="date-section date-16-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">16/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 09:15:00 – 10:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:00:00 – 10:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:30:00 – 11:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Follow Up for Cancellations & Refusals</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:00:00 – 11:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Attended HOD'S Daily morning meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:35:00 – 11:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting SK & BZ</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:50:00 – 13:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">LUNCH BREAK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:10:00 – 13:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Half day leave</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-17-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">17/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CL Audit</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 15:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CALL AUDIT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:00:00 – 16:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 16:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM OF BZ AND SK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:00:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Post reminders for pending tasks</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Announcing the winner of back to back therapies</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 17:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Marking Checklist & Delegation</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:30:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Sending callers report to MD sir</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 18:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-18-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">18/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and GHT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-21-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">21/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">BZ Trainers Weekly Review+EM (enitre operations)</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Bodyzone Sales Review +EM</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 14:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-22-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">22/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordinatin</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:15:00 – 15:45:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update in sheet</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-23-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">23/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Off linne follow upsa and co ordinations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 17:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-24-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">24/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Review Gurishjas Renovation Progress and BIPS construction</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 12:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting: SK and Heads-Bodyzone</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 13:36:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #8b5cf6;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:30:00 – 15:15:00</div>
+          
+        </div>
+      </div>
+      </div>
+    </div><div class="emp-card" data-emp="Gunjan" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#10b98122,#10b98111);border-bottom:1px solid #10b98133;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">G</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Gunjan</div>
+          <div style="font-size:12px;color:#10b981;margin-top:2px">28 tasks · 7 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#10b98122;color:#10b981;border:1px solid #10b98144;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">✓ 3 today</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div class="date-section date-16-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">16/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Checklist Report for HO and  Present the same in HOD Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 09:15:00 – 10:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:00:00 – 10:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Prepare PT Invalid report and shared with Amit Kapoor sir to cross check</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 10:30:00 – 11:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Follow Up for Cancellations & Refusals</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:00:00 – 11:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Attended HOD'S Daily morning meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 11:35:00 – 11:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting SK & BZ</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:50:00 – 13:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">LUNCH BREAK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:10:00 – 13:50:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Half day leave</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-17-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">17/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CL Audit</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:00:00 – 15:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CALL AUDIT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:00:00 – 16:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 16:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM OF BZ AND SK</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:00:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Post reminders for pending tasks</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 17:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Announcing the winner of back to back therapies</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 17:15:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Marking Checklist & Delegation</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:30:00 – 18:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Sending callers report to MD sir</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 18:00:00 – 18:30:00</div>
+          
+        </div>
+      </div><div class="date-section date-18-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">18/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and GHT</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-21-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">21/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">BZ Trainers Weekly Review+EM (enitre operations)</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 13:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Bodyzone Sales Review +EM</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 14:00:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 16:45:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-22-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">22/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordinatin</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:15:00 – 15:45:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">CRM checking for BIPS and walkins update in sheet</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 17:00:00 – 18:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-23-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">23/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Off linne follow upsa and co ordinations</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 15:30:00 – 17:00:00</div>
+          
+        </div>
+      </div><div class="date-section date-24-04-2026" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">24/04/2026</div>
+        <div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Review Gurishjas Renovation Progress and BIPS construction</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 12:00:00 – 12:30:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">Daily Meeting: SK and Heads-Bodyzone</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 13:00:00 – 13:36:00</div>
+          
+        </div><div class="task-item" style="background:#1e293b;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;margin-bottom:5px">
+          <div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4">offline co ordination</div>
+          <div style="font-size:11px;color:#64748b;margin-top:3px">⏰ 14:30:00 – 15:15:00</div>
+          
+        </div>
+      </div>
+      </div>
+    </div><div class="emp-card" data-emp="Ayush" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#3b82f622,#3b82f611);border-bottom:1px solid #3b82f633;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">A</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Ayush</div>
+          <div style="font-size:12px;color:#3b82f6;margin-top:2px">0 tasks · 0 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#1e293b;color:#64748b;border:1px solid #334155;border-radius:20px;padding:3px 10px;font-size:11px">No recent data</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div style="color:#475569;text-align:center;padding:24px;font-size:13px">No tasks recorded</div>
+      </div>
+    </div><div class="emp-card" data-emp="Diksha" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#ef444422,#ef444411);border-bottom:1px solid #ef444433;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">D</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Diksha</div>
+          <div style="font-size:12px;color:#ef4444;margin-top:2px">0 tasks · 0 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#1e293b;color:#64748b;border:1px solid #334155;border-radius:20px;padding:3px 10px;font-size:11px">No recent data</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div style="color:#475569;text-align:center;padding:24px;font-size:13px">No tasks recorded</div>
+      </div>
+    </div><div class="emp-card" data-emp="Santosh K" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#84cc1622,#84cc1611);border-bottom:1px solid #84cc1633;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#84cc16;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">S</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Santosh K</div>
+          <div style="font-size:12px;color:#84cc16;margin-top:2px">0 tasks · 0 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#1e293b;color:#64748b;border:1px solid #334155;border-radius:20px;padding:3px 10px;font-size:11px">No recent data</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div style="color:#475569;text-align:center;padding:24px;font-size:13px">No tasks recorded</div>
+      </div>
+    </div><div class="emp-card" data-emp="Devinder" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#f9731622,#f9731611);border-bottom:1px solid #f9731633;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#f97316;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">D</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Devinder</div>
+          <div style="font-size:12px;color:#f97316;margin-top:2px">0 tasks · 0 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#1e293b;color:#64748b;border:1px solid #334155;border-radius:20px;padding:3px 10px;font-size:11px">No recent data</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div style="color:#475569;text-align:center;padding:24px;font-size:13px">No tasks recorded</div>
+      </div>
+    </div><div class="emp-card" data-emp="Alok" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#06b6d422,#06b6d411);border-bottom:1px solid #06b6d433;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#06b6d4;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">A</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Alok</div>
+          <div style="font-size:12px;color:#06b6d4;margin-top:2px">0 tasks · 0 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#1e293b;color:#64748b;border:1px solid #334155;border-radius:20px;padding:3px 10px;font-size:11px">No recent data</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div style="color:#475569;text-align:center;padding:24px;font-size:13px">No tasks recorded</div>
+      </div>
+    </div><div class="emp-card" data-emp="Rohit" style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="background:linear-gradient(135deg,#a855f722,#a855f711);border-bottom:1px solid #a855f733;padding:16px 20px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:#a855f7;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0">R</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#f1f5f9">Rohit</div>
+          <div style="font-size:12px;color:#a855f7;margin-top:2px">0 tasks · 0 active days</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <span style="background:#1e293b;color:#64748b;border:1px solid #334155;border-radius:20px;padding:3px 10px;font-size:11px">No recent data</span>
+        </div>
+      </div>
+      <div style="padding:16px 20px;flex:1;overflow-y:auto;max-height:380px">
+        <div style="color:#475569;text-align:center;padding:24px;font-size:13px">No tasks recorded</div>
+      </div>
+    </div>
 </div>
 
-<footer>
-  GCS Team Report • Auto-generated from Google Calendar data •
-  <span id="footerTime"></span>
-</footer>
+<div style="text-align:center;padding:24px;color:#334155;font-size:12px">
+  GCS Team Report · Auto-generated · 2026-04-25T07:41:09.381Z
+</div>
 
 <script>
-const EMP_DATA = {"Alok":{"color":"#6366f1","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T03:30:00.000Z","end":"2026-04-16T04:30:00.000Z","title":"visit bdz and preparedbdz  and spa kora regsiter","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:30:00.000Z","end":"2026-04-16T05:30:00.000Z","title":"auidt done of bdz and spa kora sale s","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:30:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"sales heet update dof bdz and spa kora","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"sales entry made in tally of bdz and spa kora","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:20:00.000Z","end":"2026-04-16T07:50:00.000Z","title":"Daily Meeting: SK and Heads-Bodyzone  ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:30:00.000Z","end":"2026-04-16T08:30:00.000Z","title":"lunch time","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T09:30:00.000Z","title":"susepnse entry cleard of bdz ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:30:00.000Z","end":"2026-04-16T10:30:00.000Z","title":"suspense entry cleared of spa sales","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T10:30:00.000Z","end":"2026-04-16T11:30:00.000Z","title":"bdz and spa kora 2 year finnacial reprot proeared and shared with md sir in the group ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:30:00.000Z","end":"2026-04-16T12:30:00.000Z","title":"all task which is pending in my deligation remarks shared in the an write reason why they are pending and task mark calendar prepared ","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T03:30:00.000Z","end":"2026-04-20T04:30:00.000Z","title":"VISI BDZ AND PREPARED BDZ AND SPA KORA REGISTER","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T04:30:00.000Z","end":"2026-04-20T05:30:00.000Z","title":"PRPEARED BDZ AND SPA KORA AUDIT REPORT","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T05:30:00.000Z","end":"2026-04-20T06:30:00.000Z","title":"SALES ENTRY MADE ION TALLY OF BDZ AND SPA KORA ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:30:00.000Z","end":"2026-04-20T07:30:00.000Z","title":"VSIIST BDZ TO TAKE CASH FROM MD SIR","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T07:30:00.000Z","end":"2026-04-20T08:30:00.000Z","title":"LUNCH TIME ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:30:00.000Z","end":"2026-04-20T09:30:00.000Z","title":"CASH DEPSOIT IN ICIIC BANK","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:30:00.000Z","end":"2026-04-20T10:30:00.000Z","title":"BANK ENTRY MADE IN TALLY OF ALL VERTICAL ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:30:00.000Z","end":"2026-04-20T11:30:00.000Z","title":"FUND TARSNFER FROM BDZ TO SPA KORA TO MD SIR ACCOUNT  AND BANK ENYTRY MAD EIN TALLY","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:30:00.000Z","end":"2026-04-20T12:30:00.000Z","title":"INCENTIVE AND SLAARY PRPEARED OF MS HISTISHA AND TASK MARK CALENDAR PREPARED ","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T03:30:00.000Z","end":"2026-04-21T04:30:00.000Z","title":"visit bdz and prpered bdz and spa kora register","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T04:30:00.000Z","end":"2026-04-21T05:30:00.000Z","title":"prpered bdz and spa kora audit reprot","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T05:30:00.000Z","end":"2026-04-21T06:30:00.000Z","title":"prpeared bdz 4 bank allocation and meeting with sir","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:30:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"prpeaed bdz reprot april to march ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:30:00.000Z","end":"2026-04-21T09:30:00.000Z","title":"prperead 4 bank allocation system","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:30:00.000Z","end":"2026-04-21T10:30:00.000Z","title":"gst return filled of all vertical","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:30:00.000Z","end":"2026-04-21T11:30:00.000Z","title":"sales heet updated of bdz and spa kora","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T11:30:00.000Z","end":"2026-04-21T12:30:00.000Z","title":"sales update in taly bank reco task mark","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T04:30:00.000Z","end":"2026-04-23T05:30:00.000Z","title":"audit done of bdz and spa kora sales","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T05:30:00.000Z","end":"2026-04-23T06:30:00.000Z","title":"audit reprot prperaed of bd zand spa kora slaes","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T06:30:00.000Z","end":"2026-04-23T07:30:00.000Z","title":"sale sshet updated of bdz and spa kora ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T08:30:00.000Z","end":"2026-04-23T09:30:00.000Z","title":"visit incom etax ofc regarding society refund ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:30:00.000Z","end":"2026-04-23T10:00:00.000Z","title":"visit epf ofc regardinfg bdz order","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T10:00:00.000Z","end":"2026-04-23T11:00:00.000Z","title":"bak reco of bdz vertical and update din tally","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T11:00:00.000Z","end":"2026-04-23T12:00:00.000Z","title":"10 rs chan payment a done authorisation report prepared ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T12:00:00.000Z","end":"2026-04-23T13:00:00.000Z","title":"sales updated in tally task mark","desc":null}]}},"Arun Sharma":{"color":"#10b981","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:00:00.000Z","end":"2026-04-16T05:30:00.000Z","title":"check whatsapp msg and mails regarding office work, renovation and construction","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:05:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"ALL HOD's Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:00:00.000Z","title":"Review Gurishjas Renovation Progress and BIPS construction ","desc":null}],"2026-04-18":[{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T03:30:00.000Z","end":"2026-04-18T05:00:00.000Z","title":"#104 for renovation and others, meet with Marble vendor and start Kobba Work","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T05:30:00.000Z","end":"2026-04-18T06:15:00.000Z","title":"Coordinate with vendors regarding new buildings at bips and arrange sand for the same and Others","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T06:00:00.000Z","end":"2026-04-18T07:30:00.000Z","title":"Prepare the order for ABCM Patna","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T07:30:00.000Z","end":"2026-04-18T08:00:00.000Z","title":"Coordinate with music consultant and take a quotation for the same  for bips","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T08:00:00.000Z","end":"2026-04-18T08:30:00.000Z","title":"Lunch","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T08:30:00.000Z","end":"2026-04-18T12:00:00.000Z","title":"#104 for renovation , bar table fixing , light covers fixing , Ishgun section cleaning and others","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T12:00:00.000Z","end":"2026-04-18T12:55:00.000Z","title":"Billing and freezing on Gymex and others","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T13:00:00.000Z","end":"2026-04-18T13:46:00.000Z","title":"Meeting with MD sir regarding Bips new building and others","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T18:00:00.000Z","end":"2026-04-18T19:00:00.000Z","title":null,"desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T03:30:00.000Z","end":"2026-04-20T05:00:00.000Z","title":"#104 regarding renovation, Kobba Work and Others ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T05:00:00.000Z","end":"2026-04-20T05:45:00.000Z","title":"Check the Computer system at Soa Kora ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:15:00.000Z","end":"2026-04-20T07:00:00.000Z","title":"check the Water leaage issue at sector26 and coordinate with Plumber","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T07:00:00.000Z","end":"2026-04-20T07:45:00.000Z","title":"Coordinate with Capital Graphics regarding printing of Books and provide the required Data","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:30:00.000Z","end":"2026-04-20T09:15:00.000Z","title":"Coordinate with Vendors regarding Bips ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:15:00.000Z","end":"2026-04-20T10:15:00.000Z","title":"Billing and Others on Gymex  and  do the Freezing ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:15:00.000Z","end":"2026-04-20T11:15:00.000Z","title":"#104  to meet Plumber , check the work and discuss related to AC's","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:15:00.000Z","end":"2026-04-20T12:15:00.000Z","title":"Show the issue of water leakage at GCS ho26 and purchase the required Material for the same ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T12:15:00.000Z","end":"2026-04-20T12:30:00.000Z","title":"iscuss with Electrician and plumber for New building at bips ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T12:30:00.000Z","end":"2026-04-20T13:30:00.000Z","title":"Compalete checklish and delegation and Mark dashboard","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T03:30:00.000Z","end":"2026-04-21T05:00:00.000Z","title":"Repairing of water leakage at GCS HO 26","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T05:30:00.000Z","end":"2026-04-21T12:30:00.000Z","title":"Cordination with Vendors regarding  #104 renovations , Bips New building  and  PA Syatem at Bips , Music system at bips and Others","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:30:00.000Z","end":"2026-04-21T10:30:00.000Z","title":"Billing on gymex  and freezing as per requests on Gymex","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T03:30:00.000Z","end":"2026-04-22T04:30:00.000Z","title":"# 104 for renovationand Others,check work , Carpainter and Marble","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T04:30:00.000Z","end":"2026-04-22T05:30:00.000Z","title":"Meeting with MD Sir and show all the work","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T06:00:00.000Z","end":"2026-04-22T07:00:00.000Z","title":"Sector 18 and Bodyzone  with Carpainter at Bodyzone meet with MD sir regarding female spa lockers and discuss","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T07:00:00.000Z","end":"2026-04-22T08:00:00.000Z","title":"Meet with Ms. Astha g at Sector 9 regarding sosme points on #104 renovation ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T08:00:00.000Z","end":"2026-04-22T09:15:00.000Z","title":"#104  for ac vendors , meeting With Mam regarding Bar cabinet and Others ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:15:00.000Z","end":"2026-04-22T10:00:00.000Z","title":"Sampark Sector 7 regarding Property tax of Daljeet Mam","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T10:00:00.000Z","end":"2026-04-22T10:45:00.000Z","title":"Lunch ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T10:45:00.000Z","end":"2026-04-22T13:00:00.000Z","title":"Coordination with vendors regardinf #104 and Bips new building ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T13:00:00.000Z","end":"2026-04-22T13:45:00.000Z","title":"Meeting With Sir, and too the approvals on 2 PO's","desc":null}]}},"Mehak":{"color":"#f59e0b","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T03:45:00.000Z","end":"2026-04-16T04:30:00.000Z","title":"Prepare Checklist Report for HO and  Present the same in HOD Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:30:00.000Z","end":"2026-04-16T05:00:00.000Z","title":"Prepare Walk Ins & Trial Report for SK & BZ and match the report with Guards Register","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:00:00.000Z","end":"2026-04-16T05:30:00.000Z","title":"Prepare PT Invalid report and shared with Amit Kapoor sir to cross check","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:30:00.000Z","end":"2026-04-16T06:00:00.000Z","title":"Follow Up for Cancellations & Refusals","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:05:00.000Z","end":"2026-04-16T06:20:00.000Z","title":"Attended HOD'S Daily morning meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:45:00.000Z","title":"Update Call Summary sheet and preapre the Daily Call Performance sheet and present the reports in Daily SK & BZ Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:20:00.000Z","end":"2026-04-16T08:00:00.000Z","title":"Daily Meeting SK & BZ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:40:00.000Z","end":"2026-04-16T08:20:00.000Z","title":"LUNCH BREAK","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T13:00:00.000Z","title":"Half day leave ","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:30:00.000Z","end":"2026-04-17T09:30:00.000Z","title":"CL Audit","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:30:00.000Z","end":"2026-04-17T10:30:00.000Z","title":"CALL AUDIT","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:00:00.000Z","end":"2026-04-17T11:00:00.000Z","title":"offline co ordination ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:30:00.000Z","end":"2026-04-17T11:30:00.000Z","title":"CRM OF BZ AND SK","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:15:00.000Z","end":"2026-04-17T11:30:00.000Z","title":"Post reminders for pending tasks","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:30:00.000Z","end":"2026-04-17T12:30:00.000Z","title":"CRM checking for BIPS and walkins update","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:30:00.000Z","end":"2026-04-17T11:45:00.000Z","title":"Announcing the winner of back to back therapies ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:00:00.000Z","end":"2026-04-17T12:30:00.000Z","title":" Marking Checklist & Delegation","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:30:00.000Z","end":"2026-04-17T13:00:00.000Z","title":"Sending callers report to MD sir ","desc":null}],"2026-04-18":[{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T11:30:00.000Z","end":"2026-04-18T12:30:00.000Z","title":"CRM checking for BIPS and GHT","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:30:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"BZ Trainers Weekly Review+EM (enitre operations)","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:30:00.000Z","end":"2026-04-21T08:30:00.000Z","title":"Bodyzone Sales Review +EM","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T11:15:00.000Z","end":"2026-04-21T12:30:00.000Z","title":"Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:45:00.000Z","end":"2026-04-22T10:15:00.000Z","title":"offline co ordinatin ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:30:00.000Z","end":"2026-04-22T12:30:00.000Z","title":"CRM checking for BIPS and walkins update in sheet ","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T10:00:00.000Z","end":"2026-04-23T11:30:00.000Z","title":"Off linne follow upsa and co ordinations","desc":null}]}},"Ayush":{"color":"#ef4444","byDate":{"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T04:00:00.000Z","end":"2026-04-17T06:00:00.000Z","title":"BZ, SPA Kora, BIPS Tyo Sharing ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T06:00:00.000Z","end":"2026-04-17T06:30:00.000Z","title":"HO Meeting ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T06:30:00.000Z","end":"2026-04-17T07:30:00.000Z","title":"Bodyzone PT Club ( Slip ) Design ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T07:40:00.000Z","end":"2026-04-17T08:20:00.000Z","title":"Lunch Break ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:30:00.000Z","end":"2026-04-17T09:30:00.000Z","title":"BIPS Form Design ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:30:00.000Z","end":"2026-04-17T12:30:00.000Z","title":"Spa kora Creatives Revise And Birthdy Wishes Revised ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:30:00.000Z","end":"2026-04-17T13:00:00.000Z","title":"Checklist Marking ","desc":null}],"2026-04-18":[{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T04:00:00.000Z","end":"2026-04-18T06:00:00.000Z","title":"BZ, Spa Kroa, BIPS Tyo Sharing ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T06:00:00.000Z","end":"2026-04-18T07:00:00.000Z","title":"HO Meeting","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T07:00:00.000Z","end":"2026-04-18T07:30:00.000Z","title":"BZ Notice ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T08:30:00.000Z","end":"2026-04-18T09:30:00.000Z","title":"Bips Video ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T09:30:00.000Z","end":"2026-04-18T11:00:00.000Z","title":"Birthday Creatives Revised ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T11:30:00.000Z","end":"2026-04-18T12:00:00.000Z","title":"Checklist marking ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T12:00:00.000Z","end":"2026-04-18T13:00:00.000Z","title":"Social Hours ","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T04:00:00.000Z","end":"2026-04-20T06:00:00.000Z","title":"Bips Magzine Design ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:00:00.000Z","end":"2026-04-20T06:30:00.000Z","title":"Ho Meeting ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:30:00.000Z","end":"2026-04-20T07:30:00.000Z","title":"Bips Magzine Design","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:30:00.000Z","end":"2026-04-20T10:30:00.000Z","title":"Bips Magzine 2","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:30:00.000Z","end":"2026-04-20T11:30:00.000Z","title":"DIgital Marketing Meeting ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:30:00.000Z","end":"2026-04-20T12:30:00.000Z","title":"Bips Magzine Design 3","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T04:00:00.000Z","end":"2026-04-21T06:00:00.000Z","title":"Bodyzone Event Creative ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:00:00.000Z","end":"2026-04-21T06:30:00.000Z","title":"ho meeting ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:30:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"BZ event creative ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:40:00.000Z","end":"2026-04-21T08:20:00.000Z","title":"lunch break ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:30:00.000Z","end":"2026-04-21T11:30:00.000Z","title":"Bips creative ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T11:30:00.000Z","end":"2026-04-21T12:00:00.000Z","title":"checklist mark","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T12:30:00.000Z","end":"2026-04-21T13:00:00.000Z","title":"Ai bot meeting ","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T04:00:00.000Z","end":"2026-04-22T05:30:00.000Z","title":"TYO Sharing BZ , Spa kora ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T06:30:00.000Z","end":"2026-04-22T07:30:00.000Z","title":"Working on BIPS Magzine ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T10:30:00.000Z","end":"2026-04-22T12:00:00.000Z","title":"Bips Creatives Event ","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T04:00:00.000Z","end":"2026-04-23T06:00:00.000Z","title":"Tyo Sharing BZ, Spa Kora ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T06:30:00.000Z","end":"2026-04-23T07:30:00.000Z","title":"Spa kora posters ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T08:30:00.000Z","end":"2026-04-23T10:30:00.000Z","title":"Spa kora Posters ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T10:30:00.000Z","end":"2026-04-23T12:00:00.000Z","title":"bips Event creatives ","desc":null}]}},"Rohit":{"color":"#8b5cf6","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T03:30:00.000Z","end":"2026-04-16T04:30:00.000Z","title":"BANK UPDATE & RECO. IN BOOKS ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:30:00.000Z","end":"2026-04-16T06:00:00.000Z","title":"UPDATE ALL BNK IN TALLY OF SOCIETY & BIPS ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:00:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"HOD MEETING","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"RECO IF BANK BIPS ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:40:00.000Z","end":"2026-04-16T08:20:00.000Z","title":"LUNCH BREAK","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T09:30:00.000Z","title":"FILLING OF BILLS & PO OF BIPS & SOCIETY","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:30:00.000Z","end":"2026-04-16T11:00:00.000Z","title":"RECO SCHOOL PAD 2026-27","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:00:00.000Z","end":"2026-04-16T12:00:00.000Z","title":"UPDATE SHEET Accounts Team BluePrint","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:00:00.000Z","end":"2026-04-16T12:30:00.000Z","title":"MARKING CHECKLIST","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T04:30:00.000Z","end":"2026-04-21T06:00:00.000Z","title":"MAKE PAYMENTS OF VENDOR IN BIPS & SOCIETY","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:30:00.000Z","end":"2026-04-21T07:00:00.000Z","title":"MEETING WITH MD SIR","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:00:00.000Z","end":"2026-04-21T07:40:00.000Z","title":" PREPARE SHEET OF 4 BANK ALLOCATION","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:30:00.000Z","end":"2026-04-21T09:15:00.000Z","title":"VISTE BANK FOR DEPOSITE CASH ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:15:00.000Z","end":"2026-04-21T10:30:00.000Z","title":"FILL GSTR3B OF ALL VERTICALS","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:30:00.000Z","end":"2026-04-21T12:00:00.000Z","title":"PREPARE SHEET OF 4 BANK ALLOCATION","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T04:30:00.000Z","end":"2026-04-22T06:00:00.000Z","title":"UPDATE BANK IN TALLY OF BIPS & SOCIETY","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T06:30:00.000Z","end":"2026-04-22T07:30:00.000Z","title":"RECO. OF SCHOOL PAD ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T08:30:00.000Z","end":"2026-04-22T09:15:00.000Z","title":"VISTE BANK FOR DEPOSITE CASH OF BDZ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:30:00.000Z","end":"2026-04-22T10:30:00.000Z","title":"VISTE #104 FOR OFFICE WORK","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T10:30:00.000Z","end":"2026-04-22T12:00:00.000Z","title":"RECO OF SCHOOL PAD","desc":null}]}},"Diksha":{"color":"#06b6d4","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:05:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"Daily HO meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:40:00.000Z","end":"2026-04-16T08:20:00.000Z","title":"Lunch Break","desc":null}]}},"Devinder":{"color":"#ec4899","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T03:45:00.000Z","end":"2026-04-16T04:15:00.000Z","title":"Website enquries check And post in relevant group","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:15:00.000Z","end":"2026-04-16T05:45:00.000Z","title":"Social media postings All verticles","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:45:00.000Z","end":"2026-04-16T06:00:00.000Z","title":"Revert on Facebook Comments","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:05:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"ALL HOD's Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"podcast submission  Bips patiala","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:41:00.000Z","end":"2026-04-16T08:20:00.000Z","title":"Lunch Time","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T09:15:00.000Z","title":"Add BIPS Descriptions in 69 Blogs","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:15:00.000Z","end":"2026-04-16T09:30:00.000Z","title":"Reviews Revert for all verticles","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:30:00.000Z","end":"2026-04-16T11:30:00.000Z","title":"Redirection from old Links to new links  ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:30:00.000Z","end":"2026-04-16T12:15:00.000Z","title":"BIPS & ABC meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:15:00.000Z","end":"2026-04-16T12:45:00.000Z","title":"Mark Check list ","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T06:30:00.000Z","end":"2026-04-17T07:15:00.000Z","title":"BIPS Old Pages to New URL Redirection & Google Indexing","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T07:15:00.000Z","end":"2026-04-17T07:30:00.000Z","title":"Upload Bodyzone 5 New Videos in GMB ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:30:00.000Z","end":"2026-04-17T09:15:00.000Z","title":"Floor manager Ads Run","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:30:00.000Z","end":"2026-04-17T10:30:00.000Z","title":"1 ADS Run Bodyzone Job ads Floor manager","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:30:00.000Z","end":"2026-04-17T11:45:00.000Z","title":"Add Blog in Spa kora & Create backlinks","desc":"Blog<br><a href=\"https://spakora.in/blog/back-pain-daily-try-spa-therapy-in-chandigarh-today.html\">https://spakora.in/blog/back-pain-daily-try-spa-therapy-in-chandigarh-today.html</a><br><br><a href=\"https://www.protopage.com/spakora#Bookmarks\" target=\"_blank\">https://www.protopage.com/spakora#Bookmarks</a><br><a href=\"https://www.video-bookmark.com/bookmark/7106194/back-pain-daily?-try-spa-therapy-in-chandigarh-today/\" target=\"_blank\">https://www.video-bookmark.com/bookmark/7106194/back-pain-daily?-try-spa-therapy-in-chandigarh-today/</a><br><a href=\"https://adfty.biz/english/back-pain-daily-try-spa-therapy-in-chandigarh-today/\" target=\"_blank\">https://adfty.biz/english/back-pain-daily-try-spa-therapy-in-chandigarh-today/</a><br><a href=\"https://1look4.com/story/news/back-pain-daily-try-spa-therapy-in-chandigarh-today\" target=\"_blank\">https://1look4.com/story/news/back-pain-daily-try-spa-therapy-in-chandigarh-today</a><br><a href=\"https://adfty.biz/health/neck-back-pain-headaches-luxury-spa-relief-in-chandigarh/\" target=\"_blank\">https://adfty.biz/health/neck-back-pain-headaches-luxury-spa-relief-in-chandigarh/</a><br><a href=\"https://spakora.dropmark.com/1739813/37590997\" target=\"_blank\">https://spakora.dropmark.com/1739813/37590997</a><br><a href=\"https://www.peoplebookmarks.com/preview-bookmark/\" target=\"_blank\">https://www.peoplebookmarks.com/preview-bookmark/</a><br><a href=\"https://tuffsocial.com/article/272645/15452/back-pain-daily-try-spa-therapy-in-chandigarh-today\" target=\"_blank\">https://tuffsocial.com/article/272645/15452/back-pain-daily-try-spa-therapy-in-chandigarh-today</a><br><a href=\"https://diigo.com/012dlyh\" target=\"_blank\">https://diigo.com/012dlyh</a><br><a href=\"https://www.maanation.com/post/968951_modern-professional-life-in-chandigarh-can-be-demanding-long-office-hours-desk-j.html\" target=\"_blank\">https://www.maanation.com/post/968951_modern-professional-life-in-chandigarh-can-be-demanding-long-office-hours-desk-j.html</a><br><a href=\"https://www.socialbookmarkssite.com/bookmark/6236562/back-pain-daily-try-spa-therapy-in-chandigarh-today/\" target=\"_blank\">https://www.socialbookmarkssite.com/bookmark/6236562/back-pain-daily-try-spa-therapy-in-chandigarh-today/</a><br><a href=\"https://www.akonter.com/story/back-pain-daily-try-spa-therapy-in-chandigarh-today/\" target=\"_blank\">https://www.akonter.com/story/back-pain-daily-try-spa-therapy-in-chandigarh-today/</a><br><a href=\"https://www.openfaves.com/preview-article/\" target=\"_blank\">https://www.openfaves.com/preview-article/</a><br><a href=\"https://in.pinterest.com/pin/857654322837037086\" target=\"_blank\">https://in.pinterest.com/pin/857654322837037086</a><br><a href=\"https://www.pearltrees.com/spakoraadmin#item792292756\" target=\"_blank\">https://www.pearltrees.com/spakoraadmin#item792292756</a><br><a href=\"https://sco.lt/5KNwTw\" target=\"_blank\">https://sco.lt/5KNwTw</a><br><a href=\"https://diigo.com/012dlyh\" target=\"_blank\">https://diigo.com/012dlyh</a>"},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:45:00.000Z","end":"2026-04-17T12:00:00.000Z","title":"Nearbuy Listing Documents provide In Bodyzone Letter ads To live Spa kora Listing","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:00:00.000Z","end":"2026-04-17T12:15:00.000Z","title":"Spa kora Business lisitngs Creation","desc":"<br><a href=\"https://massagenearme.pro/?post_type=listing&amp;p=2010\">https://massagenearme.pro/?post_type=listing&amp;p=2010</a><br><a href=\"https://threebestrated.in/submit-business\">https://threebestrated.in/submit-business</a>"}],"2026-04-18":[{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T06:30:00.000Z","end":"2026-04-18T07:45:00.000Z","title":"Blog add in Bodyzone & Create backlinks","desc":"The Science Behind Sleep for Maximum Muscle Development<br><a href=\"https://www.bodyzonegym.in/the-science-behind-sleep-for-maximum-muscle-development/\">https://www.bodyzonegym.in/the-science-behind-sleep-for-maximum-muscle-development/</a><br>Learn how sleep helps muscle growth, recovery, hormones, and gym performance. Discover expert fitness tips from Bodyzone Premium Gym Chandigarh.<br><br><a href=\"https://chatterchat.com/reels/32506\">https://chatterchat.com/reels/32506</a><br><a href=\"https://seller.trepup.com/admin/store/EDE0173B8-7F36A7/profile\">https://seller.trepup.com/admin/store/EDE0173B8-7F36A7/profile</a><br><a href=\"https://my.bookmax.net/bookmarks\">https://my.bookmax.net/bookmarks</a><br><a href=\"https://mootin.com/story/business/the-science-behind-sleep-for-maximum-muscle-development\">https://mootin.com/story/business/the-science-behind-sleep-for-maximum-muscle-development</a><br><a href=\"https://flip.it/d_4HKx\">https://flip.it/d_4HKx</a><br><a href=\"https://mootin.com/story/business/the-science-behind-sleep-for-maximum-muscle-development-mgn\">https://mootin.com/story/business/the-science-behind-sleep-for-maximum-muscle-development-mgn</a><br><a href=\"https://coolpot.com/story/health/the-science-behind-sleep-for-maximum-muscle-development\">https://coolpot.com/story/health/the-science-behind-sleep-for-maximum-muscle-development</a><br><a href=\"https://www.scoop.it/topic/bodyzone/p/4170921754/2026/04/18/the-science-behind-sleep-for-maximum-muscle-development\">https://www.scoop.it/topic/bodyzone/p/4170921754/2026/04/18/the-science-behind-sleep-for-maximum-muscle-development</a><br><a href=\"https://in.pinterest.com/pin/235594624252917069\">https://in.pinterest.com/pin/235594624252917069</a><br><a href=\"https://yoomark.com/content/science-behind-sleep-maximum-muscle-development\">https://yoomark.com/content/science-behind-sleep-maximum-muscle-development</a><br><a href=\"https://www.instapaper.com/read/2003695512\">https://www.instapaper.com/read/2003695512</a><br><a href=\"https://my.bookmax.net/bookmarks\">https://my.bookmax.net/bookmarks</a><br><a href=\"https://diigo.com/012dthb\">https://diigo.com/012dthb</a><br><a href=\"https://vahuk.com/story/the-science-behind-sleep-for-maximum-muscle-development/\">https://vahuk.com/story/the-science-behind-sleep-for-maximum-muscle-development/</a><br><a href=\"https://padlet.com/bodyzonechandigarh/bodyzone-sv3bboqmra41u3o9/wish/R7dXadN6bDK1Z6bl\">https://padlet.com/bodyzonechandigarh/bodyzone-sv3bboqmra41u3o9/wish/R7dXadN6bDK1Z6bl</a><br><a href=\"https://1look4.com/story/health/the-science-behind-sleep-for-maximum-muscle-development\">https://1look4.com/story/health/the-science-behind-sleep-for-maximum-muscle-development</a><br><a href=\"https://penzu.com/journals/32876409/117001840\">https://penzu.com/journals/32876409/117001840</a><br><a href=\"https://learningapps.org/display?v=p4ybt0a2n26\">https://learningapps.org/display?v=p4ybt0a2n26</a>"},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T08:30:00.000Z","end":"2026-04-18T09:00:00.000Z","title":"Add New Questions in Floor Manager Bodyzone Campaign","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T09:00:00.000Z","end":"2026-04-18T09:15:00.000Z","title":"1 Deligation Task Complete Telegram Leads ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T09:30:00.000Z","end":"2026-04-18T10:00:00.000Z","title":"New Videos add in BIPS GMB","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T10:00:00.000Z","end":"2026-04-18T11:00:00.000Z","title":"Weekly Digital Marketing Report Shared with Mr Raj","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T11:00:00.000Z","end":"2026-04-18T11:45:00.000Z","title":"Weekly Ranking Update ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T11:45:00.000Z","end":"2026-04-18T12:15:00.000Z","title":"ABC Montessori & BIPS Meeting","desc":null}],"2026-04-19":[{"date":"2026-04-18T18:30:00.000Z","start":"2026-04-19T05:30:00.000Z","end":"2026-04-19T06:15:00.000Z","title":"podcast submissions","desc":null},{"date":"2026-04-18T18:30:00.000Z","start":"2026-04-19T09:30:00.000Z","end":"2026-04-19T11:00:00.000Z","title":"add blog inbodyzone and create backlinks","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:30:00.000Z","end":"2026-04-20T07:30:00.000Z","title":"Organic Leads update in Sheet","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:30:00.000Z","end":"2026-04-20T09:45:00.000Z","title":"Blog update in Spa Kora and create backlinks","desc":"<a href=\"https://diigo.com/012e6tv\">https://diigo.com/012e6tv</a><br><a href=\"https://sco.lt/8xGb5M\">https://sco.lt/8xGb5M</a><br><a href=\"https://www.maanation.com/post/969937_body-stiffness-daily-get-a-full-body-massage-in-chandigarh-at-spa-kora-relax-mus.html\">https://www.maanation.com/post/969937_body-stiffness-daily-get-a-full-body-massage-in-chandigarh-at-spa-kora-relax-mus.html</a><br><a href=\"https://www.pearltrees.com/spakoraadmin#item792529989\">https://www.pearltrees.com/spakoraadmin#item792529989</a><br><a href=\"https://diigo.com/012e6tv\">https://diigo.com/012e6tv</a><br><a href=\"https://www.socialbookmarkssite.com/bookmark/6238090/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora/\">https://www.socialbookmarkssite.com/bookmark/6238090/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora/</a><br><a href=\"https://tuffsocial.com/article/272962/15452/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora\">https://tuffsocial.com/article/272962/15452/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora</a><br><a href=\"https://1look4.com/story/health/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora\">https://1look4.com/story/health/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora</a><br><a href=\"https://adfty.biz/health/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora/\">https://adfty.biz/health/body-stiffness-full-body-massage-in-chandigarh-at-spa-kora/</a><br><a href=\"https://spakora.dropmark.com/1739813/37599502\">https://spakora.dropmark.com/1739813/37599502</a><br><a href=\"https://www.video-bookmark.com/bookmark/7108534/body-stiffness?-full-body-massage-in-chandigarh/\">https://www.video-bookmark.com/bookmark/7108534/body-stiffness?-full-body-massage-in-chandigarh/</a><br><a href=\"https://www.protopage.com/spakora#Bookmarks\">https://www.protopage.com/spakora#Bookmarks</a><br><a href=\"https://www.akonter.com/story/full-body-massage-in-chandigarh-at-spa-kora/\">https://www.akonter.com/story/full-body-massage-in-chandigarh-at-spa-kora/</a><br><a href=\"https://www.openfaves.com/preview-article/\">https://www.openfaves.com/preview-article/</a><br><a href=\"https://www.peoplebookmarks.com/preview-bookmark/\">https://www.peoplebookmarks.com/preview-bookmark/</a>"},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:00:00.000Z","end":"2026-04-20T10:15:00.000Z","title":"increase budget in Floor manager Ads & delete negitive comments on Facebook","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:15:00.000Z","end":"2026-04-20T10:45:00.000Z","title":"Digital marketing meeting","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:45:00.000Z","end":"2026-04-20T12:15:00.000Z","title":"BIPS Blog add & Create backlinks","desc":"Why Learning Multiple Languages Helps Children Succeed in Life<br><a href=\"https://www.bipspatiala.net/multiple-languages-helps-children-succeed.html\">https://www.bipspatiala.net/multiple-languages-helps-children-succeed.html</a><br>Discover why learning multiple languages helps children succeed in life. Know how BIPS Patiala teaches French and German from an early age.<br><br><a href=\"https://1look4.com/story/health/why-learning-multiple-languages-helps-children-succeed\">https://1look4.com/story/health/why-learning-multiple-languages-helps-children-succeed</a><br><a href=\"https://www.instapaper.com/read/2004275652\">https://www.instapaper.com/read/2004275652</a><br><a href=\"https://www.socialbookmarkssite.com/bookmark/6238176/why-learning-multiple-languages-helps-children-succeed-in-life/\">https://www.socialbookmarkssite.com/bookmark/6238176/why-learning-multiple-languages-helps-children-succeed-in-life/</a><br><a href=\"https://www.pearltrees.com/bipsschool#item792543120\">https://www.pearltrees.com/bipsschool#item792543120</a><br><a href=\"https://sco.lt/6606M4\">https://sco.lt/6606M4</a><br><a href=\"https://diigo.com/012e8ku\">https://diigo.com/012e8ku</a><br><a href=\"https://coolpot.com/story/health/why-learning-multiple-languages-helps-children-succeed-qsg\">https://coolpot.com/story/health/why-learning-multiple-languages-helps-children-succeed-qsg</a><br><a href=\"https://1look4.com/story/news/why-learning-multiple-languages-helps-children-succeed-yza\">https://1look4.com/story/news/why-learning-multiple-languages-helps-children-succeed-yza</a><br><a href=\"https://free-socialbookmarking.com/story/why-learning-multiple-languages-helps-children-succeed-in-life\">https://free-socialbookmarking.com/story/why-learning-multiple-languages-helps-children-succeed-in-life</a><br><a href=\"https://coolpot.com/story/health/why-learning-multiple-languages-helps-children-succeed-qsg\">https://coolpot.com/story/health/why-learning-multiple-languages-helps-children-succeed-qsg</a><br><a href=\"https://www.moptu.com/bipspatiala~797827\">https://www.moptu.com/bipspatiala~797827</a>"}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:30:00.000Z","end":"2026-04-21T07:00:00.000Z","title":"Faq Add Shared By Boney Ji on Bodyzone","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:00:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"404 Error pages redirection in BIPS shared by MD sir","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:30:00.000Z","end":"2026-04-21T09:00:00.000Z","title":"Delete Facebook negitive comments & Upload new videos on BIPS & BIPS preschool","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:15:00.000Z","end":"2026-04-21T10:45:00.000Z","title":"Whatsapp number changed in Facbook Shared by MR joshvir","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:45:00.000Z","end":"2026-04-21T12:15:00.000Z","title":"BIPS old blogs urls to new Change","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T12:30:00.000Z","end":"2026-04-21T13:00:00.000Z","title":"Meeting with Joshveer Whatsapp bot","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T06:30:00.000Z","end":"2026-04-22T07:00:00.000Z","title":"Reviews Revert Spa kora ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T07:00:00.000Z","end":"2026-04-22T07:30:00.000Z","title":"Blog add in BIPS Website & Create backlinks","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T08:30:00.000Z","end":"2026-04-22T09:15:00.000Z","title":"Deligation Task \t Share details of all campaigns run for Bodyzone, including pricing, in a structured Google Sheet ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:30:00.000Z","end":"2026-04-22T11:00:00.000Z","title":"Resolve Errors of Bodyzone websie & Fix Blog Page with MR Vikram","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:00:00.000Z","end":"2026-04-22T11:30:00.000Z","title":"ABC Montessori Dirba Posting on Earth Day","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:30:00.000Z","end":"2026-04-22T12:15:00.000Z","title":"Blogs Add in ABC Montessori Dirba","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T06:30:00.000Z","end":"2026-04-23T07:30:00.000Z","title":"add Blog on spa kora & Create backlinks","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T08:30:00.000Z","end":"2026-04-23T09:00:00.000Z","title":"add Images in Bodyzone Overall campaign Run From 2023-2026","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:00:00.000Z","end":"2026-04-23T09:30:00.000Z","title":"Revert on negitive Reviews for Bodyzone","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:30:00.000Z","end":"2026-04-23T10:45:00.000Z","title":"Bodzone Ai Postings on social meida Linkedin & story with link","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T10:45:00.000Z","end":"2026-04-23T11:45:00.000Z","title":"bodyzone error resolve report shared by MR Divij","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T11:45:00.000Z","end":"2026-04-23T12:15:00.000Z","title":"Edu Bloom Page name change","desc":null}]}},"Rajinder":{"color":"#14b8a6","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:00:00.000Z","end":"2026-04-16T05:00:00.000Z","title":"Prepare invalid members report/Walkin report with audit","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:00:00.000Z","end":"2026-04-16T05:30:00.000Z","title":"Bill sent to bodyzone members - 15th april","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:30:00.000Z","end":"2026-04-16T06:00:00.000Z","title":"Daat revised for ashima and Vivek bodyzone calling - pending leads","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:05:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"ALL HOD's Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"SEO ranking ai agent completed ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:20:00.000Z","end":"2026-04-16T07:50:00.000Z","title":"Daily Meeting: SK and Heads-Bodyzone  ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:40:00.000Z","end":"2026-04-16T08:20:00.000Z","title":"Lunch Break","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T11:30:00.000Z","title":"AI agent preparing for fb ad campaign - where it show high cost per lead alarm. show leads details ad wise , relevant, irrelevant, visit and order won - spa kora","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:30:00.000Z","end":"2026-04-16T12:00:00.000Z","title":"Task marked in dashboard","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:00:00.000Z","end":"2026-04-16T12:45:00.000Z","title":"bips meeting","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T04:00:00.000Z","end":"2026-04-17T04:30:00.000Z","title":"Inavlid members report checked and prepared","desc":"Changes made to the title, description or attachments will not be saved. To make edits, please go to: https://tasks.google.com/task/_CQsmhlRCNFlwGB0"},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T04:30:00.000Z","end":"2026-04-17T05:00:00.000Z","title":"Walkins report checked and audited for bz and sk","desc":"Changes made to the title, description or attachments will not be saved. To make edits, please go to: https://tasks.google.com/task/8zHG9Uiw8qEQ3f6S"},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T05:00:00.000Z","end":"2026-04-17T07:00:00.000Z","title":"AI agent prepared for calander summery analysis of all employees","desc":"Changes made to the title, description or attachments will not be saved. To make edits, please go to: https://tasks.google.com/task/TbfS8WuHdqEkhcy9"},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T07:00:00.000Z","end":"2026-04-17T07:45:00.000Z","title":"Naman call recording added with call audit ai","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T07:45:00.000Z","end":"2026-04-17T08:25:00.000Z","title":null,"desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:30:00.000Z","end":"2026-04-17T09:00:00.000Z","title":"Ashima call audit AI transferred to bodyzone from BIPS","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:00:00.000Z","end":"2026-04-17T09:45:00.000Z","title":"AI meeting with divij and Boney","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:45:00.000Z","end":"2026-04-17T10:45:00.000Z","title":"Action sheet achievement filled for bz","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:45:00.000Z","end":"2026-04-17T11:15:00.000Z","title":"Training gien to spa team - Tag the  data category in booking details","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:15:00.000Z","end":"2026-04-17T12:00:00.000Z","title":"Offline meeting wth CMD sir - AI tool","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:00:00.000Z","end":"2026-04-17T12:45:00.000Z","title":"Dashboard tasks marked","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T05:15:00.000Z","end":"2026-04-20T09:45:00.000Z","title":"EM Score prepared for GCS HO, Branches , Bodyzone and Spa kora","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:30:00.000Z","end":"2026-04-20T07:00:00.000Z","title":"Check functaionality of the FMS processes as report prepared by PC ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T07:00:00.000Z","end":"2026-04-20T07:30:00.000Z","title":"Sent Invoices to invalid members and Bill receipts as per sales sheet","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:30:00.000Z","end":"2026-04-20T10:30:00.000Z","title":"Core Team; Present the detailed audit report of each task ( under Delegation, CL & FMS) done and not done, productivity, time devoted(screen and otherwise) in the entire week, late coming, unapproved leaves, false marking,great job done, attitude, misconduct/mistake done,  by each employee of GCS group. ( Enter in the CL of all 4 persons)","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T03:45:00.000Z","end":"2026-04-21T05:00:00.000Z","title":"EM prepared for trainers","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T05:00:00.000Z","end":"2026-04-21T06:00:00.000Z","title":"Bodyzone sale sand operation em prepared","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:00:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"weekly sales ppt updated for bz","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:30:00.000Z","end":"2026-04-21T08:45:00.000Z","title":"Bz review meeting","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:30:00.000Z","end":"2026-04-21T10:15:00.000Z","title":"Em prepared for spa kora along with weekly ppt","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:15:00.000Z","end":"2026-04-21T11:15:00.000Z","title":"spa kora meeting","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T11:15:00.000Z","end":"2026-04-21T12:00:00.000Z","title":"Data provided to amit sir ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T12:00:00.000Z","end":"2026-04-21T12:30:00.000Z","title":"Seo action plan and checklist prepared for all verticlas","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:00:00.000Z","end":"2026-04-22T12:00:00.000Z","title":"Presentation by Amit; Performance of All HO staff","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T04:30:00.000Z","end":"2026-04-23T05:00:00.000Z","title":"Screenshot capture function integrated in automated call audit ai","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T05:00:00.000Z","end":"2026-04-23T06:00:00.000Z","title":"Class room checklist prepared for bips teacher","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T06:30:00.000Z","end":"2026-04-23T07:00:00.000Z","title":"Trainers prefilled feedback form prepared and configured in vivek calling data","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T07:00:00.000Z","end":"2026-04-23T07:45:00.000Z","title":"CR% prepared for anu and lakshmi march 2026 onwards","desc":null}]}},"Priyanka":{"color":"#f97316","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:00:00.000Z","end":"2026-04-16T13:00:00.000Z","title":"Forwarding Audios , Updating TO Do List and Pending Approvals (Coordination with CMD Sir), arranging all Meetings ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:15:00.000Z","end":"2026-04-16T04:45:00.000Z","title":"30 mins Offline forwarding audios from phone","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:00:00.000Z","end":"2026-04-16T05:30:00.000Z","title":"Updated VDTI Sheet ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:00:00.000Z","end":"2026-04-16T05:45:00.000Z","title":"Checked pending approvals and responses shared with Doers , tasks Delegated ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:45:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"Updated Overdue Delegations in PPT and Organized ALL HOD's Meeting ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:00:00.000Z","title":"Prepared Incentive letters for Amit Sir and Ms.Deepmala ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:00:00.000Z","end":"2026-04-16T07:45:00.000Z","title":"Updated Financial Reports and Organized Daily Meeting: SK and Heads-Bodyzone","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:45:00.000Z","end":"2026-04-16T08:00:00.000Z","title":"Emailed Incentive plan to GM Sir ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:05:00.000Z","end":"2026-04-16T08:45:00.000Z","title":"Lunch","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:45:00.000Z","end":"2026-04-16T09:45:00.000Z","title":"Updated To Do List ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T10:00:00.000Z","end":"2026-04-16T10:30:00.000Z","title":"Audit of completed Delegations for the Last Day.","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T10:30:00.000Z","end":"2026-04-16T11:00:00.000Z","title":"Coordination with Jasbir ji in Whatsapp Group for pending cases","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:00:00.000Z","end":"2026-04-16T11:30:00.000Z","title":"Updated VDTI Sheet","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:30:00.000Z","end":"2026-04-16T12:00:00.000Z","title":"Coordination with Alok for payment of Joginder Gill ji ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:45:00.000Z","end":"2026-04-16T12:30:00.000Z","title":"Meeting- BIPS Global Mont. Event Planning ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:00:00.000Z","end":"2026-04-16T12:30:00.000Z","title":"Checked MD Sir's email ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:30:00.000Z","end":"2026-04-16T13:00:00.000Z","title":"Delegation Tasks Marked , Calendar Shared, Carried Forward MD sir's TO Do List and Reminder set to Sir for Checking Pending Approvals  ","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T04:00:00.000Z","end":"2026-04-17T05:00:00.000Z","title":"1 Hour offline (Forwarded audios)","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T05:00:00.000Z","end":"2026-04-17T05:15:00.000Z","title":"15 minutes Offline coordination with Alok for Mr.Joginder Gill's Payment ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T05:30:00.000Z","end":"2026-04-17T05:45:00.000Z","title":"Offline - Call Arranged - Deepak ji AGM and CMD Sir ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:00:00.000Z","end":"2026-04-17T09:30:00.000Z","title":"Scheduling CMD Sir's Calender","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:30:00.000Z","end":"2026-04-17T09:45:00.000Z","title":"Call Arrange between CMD Sir and Manmohan sir ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:15:00.000Z","end":"2026-04-17T10:30:00.000Z","title":"Arranged Ms. Shivangi's Meeting with CMD Sir","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:30:00.000Z","end":"2026-04-17T11:00:00.000Z","title":"Updated Approval Sheet and To Do List","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:30:00.000Z","end":"2026-04-17T12:00:00.000Z","title":"Arranged AI Meeting (Implementation in GCS and Training BIPS Teachers)","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:00:00.000Z","end":"2026-04-17T12:45:00.000Z","title":"Review- Pending Payments and legal Cases ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:45:00.000Z","end":"2026-04-17T13:15:00.000Z","title":"Offline 30 minutes Meeting with CMD Sir regarding Kapoor Photostat Documents and Discussion of Disney Castle ","desc":null}],"2026-04-18":[{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T04:15:00.000Z","end":"2026-04-18T05:00:00.000Z","title":"All Audios forwarded","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T05:30:00.000Z","end":"2026-04-18T05:45:00.000Z","title":"Approvals shared with Team ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T06:30:00.000Z","end":"2026-04-18T07:15:00.000Z","title":"Updated to do list ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T08:30:00.000Z","end":"2026-04-18T09:00:00.000Z","title":"Emailed Indu Mam for Re-engagement with Esteemed Patrons and response shared with Mam for KPA and KRI's of BIPS Staff ","desc":null}],"2026-04-19":[{"date":"2026-04-18T18:30:00.000Z","start":"2026-04-19T04:00:00.000Z","end":"2026-04-19T13:00:00.000Z","title":"Audios Forwarding ","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:30:00.000Z","end":"2026-04-20T07:15:00.000Z","title":"Call with Indu Mam for KRA's and KPI's , updated approval sheet ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:45:00.000Z","end":"2026-04-20T10:30:00.000Z","title":"EM Organized for HO (40 minutes)","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:30:00.000Z","end":"2026-04-20T11:15:00.000Z","title":"Organized Digital Marketing Meeting ","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:15:00.000Z","end":"2026-04-20T11:45:00.000Z","title":"Meeting with Mr. Joshvir / Mr.boney and Mr.ayush","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:45:00.000Z","end":"2026-04-20T12:15:00.000Z","title":"Buffer - Cordination with CMD Sir and Alok Offline 20 minutes (Ms. Hitisha's FnF)","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T05:30:00.000Z","end":"2026-04-21T06:15:00.000Z","title":"Updated To do list and shared responses from Pending approvals with team members ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:20:00.000Z","end":"2026-04-21T06:45:00.000Z","title":"Accounts Meeting ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:45:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"BZ General Trainers Meeting ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:45:00.000Z","end":"2026-04-21T08:30:00.000Z","title":"BZ- Weekly Sales Review ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:15:00.000Z","end":"2026-04-21T08:45:00.000Z","title":"Meeting organized and coordination with Mr.Sohit - PNB ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:30:00.000Z","end":"2026-04-21T08:45:00.000Z","title":"Meeting Director Training - AGM/ FM's and GM","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:30:00.000Z","end":"2026-04-21T10:00:00.000Z","title":"Coordination- Mr. Gaurav for 15 CA - CB","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:15:00.000Z","end":"2026-04-21T11:00:00.000Z","title":"SK Weekly Sales Review ","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T12:30:00.000Z","end":"2026-04-21T13:00:00.000Z","title":"Meeting with Mr.Joshvir (AI Bot's Review)","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T04:15:00.000Z","end":"2026-04-22T04:45:00.000Z","title":"Offline - audios forwarded from phone ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T05:30:00.000Z","end":"2026-04-22T06:00:00.000Z","title":"Responses from Approval Sheet Shared with concerned Doers","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T05:30:00.000Z","end":"2026-04-22T05:45:00.000Z","title":"Updated To do List ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T06:30:00.000Z","end":"2026-04-22T07:00:00.000Z","title":"Follow up with Indu Mam on MOM's for Last Thursday","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T07:00:00.000Z","end":"2026-04-22T07:30:00.000Z","title":"Meeting Pre School Collab Implementation","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:45:00.000Z","end":"2026-04-22T10:45:00.000Z","title":"Buffer cordinatwion with team for arranging meetings and follow ups on Delegations ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:00:00.000Z","end":"2026-04-22T11:30:00.000Z","title":"Meeting with Ms. Harpreet Dirba","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T12:00:00.000Z","end":"2026-04-22T12:30:00.000Z","title":"Worked on Delegations-Prepared -Bachata Spain World Congress 2026_Festival schedule and key details ; MOM – Task Status Report (16 April 2026 Meeting)-With Color Coding","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T12:55:00.000Z","end":"2026-04-22T13:20:00.000Z","title":"Offline Meeting with CMD Sir (6-25 to 6-50pm)","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T04:15:00.000Z","end":"2026-04-23T05:15:00.000Z","title":"Offline Audios Forwarded","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T06:30:00.000Z","end":"2026-04-23T07:15:00.000Z","title":"Approval responses shared with team and updated To do list","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T07:50:00.000Z","end":"2026-04-23T08:20:00.000Z","title":"Offline Coordination with Yash and Vivek for NDFF Calling ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:00:00.000Z","end":"2026-04-23T10:00:00.000Z","title":"Checked All Whatsapp Groups - responded to messages ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T10:00:00.000Z","end":"2026-04-23T10:15:00.000Z","title":"Reports sent to CMD Sir and Coordination with sir for Meetings to be scheduled ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T11:30:00.000Z","end":"2026-04-23T12:00:00.000Z","title":"NDFF Meeting (Yash / GM Sir / Raj / Vivek- CMD Sir ) 5:00 – 5:30pm","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T12:00:00.000Z","end":"2026-04-23T12:45:00.000Z","title":"Meeting Strategic Discussion (All Year planning for BIPS)","desc":null}]}},"Boney":{"color":"#64748b","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:00:00.000Z","end":"2026-04-16T05:30:00.000Z","title":"Researched on the Alternatives of 11 labs ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:30:00.000Z","end":"2026-04-16T06:00:00.000Z","title":"updated PPT for both meetings ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:00:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"Morning Meeting ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:00:00.000Z","title":"Camera Audit ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:00:00.000Z","title":"updated calling sheet ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:00:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"Walkin Audit for BZ and SK ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:20:00.000Z","end":"2026-04-16T08:00:00.000Z","title":"SK BZ Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T12:00:00.000Z","title":"Audited all 10 hoardings, and created FnF list for last month of hoardings ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:00:00.000Z","end":"2026-04-16T12:30:00.000Z","title":"created 2 captions for BIPS, Shared CAll Audit report with CMD sir, worked on ways to created AI Sales Agent for BZ. ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:30:00.000Z","end":"2026-04-16T13:00:00.000Z","title":"Call Audit ","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T03:45:00.000Z","end":"2026-04-17T05:00:00.000Z","title":"Analyzed the Docs send by CMD sir for AI Automation ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T04:45:00.000Z","end":"2026-04-17T05:15:00.000Z","title":"handled the LinkedIn for CMD sir ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T05:15:00.000Z","end":"2026-04-17T05:45:00.000Z","title":"Connected with BIPS for the total count of teachers ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T05:30:00.000Z","end":"2026-04-17T06:00:00.000Z","title":"Upated PPT for both meetings ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T07:00:00.000Z","end":"2026-04-17T07:30:00.000Z","title":"audited walkin report ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:00:00.000Z","end":"2026-04-17T08:30:00.000Z","title":"lunch ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:30:00.000Z","end":"2026-04-17T09:30:00.000Z","title":"Meeting with Raj and Divij on Automation ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:30:00.000Z","end":"2026-04-17T10:15:00.000Z","title":"created BIPS first class content for AI ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:15:00.000Z","end":"2026-04-17T11:00:00.000Z","title":"created Pricing PPT for Automation ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:00:00.000Z","end":"2026-04-17T12:00:00.000Z","title":"Meeting with CMD sir ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:00:00.000Z","end":"2026-04-17T12:30:00.000Z","title":"Bot Audit ","desc":null}],"2026-04-18":[{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T03:45:00.000Z","end":"2026-04-18T05:00:00.000Z","title":"Took Demo of Notion, Researched, learned all about its working. ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T05:00:00.000Z","end":"2026-04-18T06:00:00.000Z","title":"Created the Press Note for Press Coverage","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T07:00:00.000Z","end":"2026-04-18T07:30:00.000Z","title":"Updated the PPT for morning, BZ, and SK meeting. ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T08:30:00.000Z","end":"2026-04-18T09:30:00.000Z","title":"Coordinated with Dainik Bhaskar for Press Coverage ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T09:30:00.000Z","end":"2026-04-18T10:30:00.000Z","title":"Coordinated with Dainik Jagran, Jagbani, Punjab Kesari, Hindustan Times, and the Tribune for News. ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T10:30:00.000Z","end":"2026-04-18T11:30:00.000Z","title":"Coordinated with social media pages, Patiala Politics, Patiala Helpclub, Patiala News, Channel Y of Patiala, and some other YT channels for the coverage. ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T11:30:00.000Z","end":"2026-04-18T12:30:00.000Z","title":"Created the  Weekly Manager Report","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T11:30:00.000Z","end":"2026-04-18T12:00:00.000Z","title":"Created Call Audit report for BIPS, BZ, & Sk ","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T12:00:00.000Z","end":"2026-04-18T12:30:00.000Z","title":"Harjit's Report Audit","desc":null},{"date":"2026-04-17T18:30:00.000Z","start":"2026-04-18T12:30:00.000Z","end":"2026-04-18T13:00:00.000Z","title":"BOT Audit ","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T03:50:00.000Z","end":"2026-04-20T04:05:00.000Z","title":"Send approval msg to CMD — ex-PTs calling pitch & message","desc":"Message to CMD Sir:\n\n\"Good Morning sir, Please approve the calling pitch and Message for ex-PTs of BZ.\"\n\nAttach: calling pitch + message copy."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T04:05:00.000Z","end":"2026-04-20T05:05:00.000Z","title":"Delegation Audit","desc":"Delegation audit — review of tasks delegated across verticals (BZ, BIPS, Global Talent, Spa Kora), status check, gaps, and follow-ups owed."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T05:05:00.000Z","end":"2026-04-20T06:05:00.000Z","title":"Camera Audit","desc":"Camera audit — inspect CCTV coverage, blind spots, recording status, and operational health across premises."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:05:00.000Z","end":"2026-04-20T08:00:00.000Z","title":"BZ Influencers — Creative + Collaboration Agreement (share w/ CMD)","desc":"Deliverables:\n1. Design an attractive creative for BZ Influencers collaboration.\n2. Formalize the collaboration document / agreement between BZ and Influencers.\n3. Share both with CMD Sir for approval."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:00:00.000Z","end":"2026-04-20T08:15:00.000Z","title":"Send approval msg to CMD — BZ × Influencers agreement","desc":"Message to CMD Sir:\n\n\"Good afternoon sir, please approve the agreement between BZ and Influencers.\"\n\nAttach: creative + finalized agreement."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:15:00.000Z","end":"2026-04-20T09:15:00.000Z","title":"21-Day Transformation Pitch — Mr. Harjeet (share w/ CMD)","desc":"Create a 21-day transformation program pitch for Mr. Harjeet. Cover structure, deliverables, timeline, pricing framing. Share with CMD Sir for approval once complete."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:15:00.000Z","end":"2026-04-20T09:30:00.000Z","title":"Send approval msg to CMD — 21-Day Confidence Camp pitch (Mrs. Chugh)","desc":"Message to CMD Sir:\n\n\"Good afternoon sir, please approve the calling pitch for 21 day Confidence Camp (Requested by Mrs. Chugh).\"\n\nAttach: finalized calling pitch."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:30:00.000Z","end":"2026-04-20T11:00:00.000Z","title":"Meeting — DoubleClick","desc":"Meeting with DoubleClick. Fixed slot."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:00:00.000Z","end":"2026-04-20T13:00:00.000Z","title":"Handle CMD Sir's LinkedIn account","desc":"Handling of LinkedIn account of CMD Sir — content, outreach responses, connection requests, profile management."},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:30:00.000Z","end":"2026-04-20T11:45:00.000Z","title":"Em","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T03:56:00.000Z","end":"2026-04-21T04:40:00.000Z","title":"Updated calling audit report for BIPS (morning meeting)","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T04:40:00.000Z","end":"2026-04-21T05:15:00.000Z","title":"Shared calling audit report — Bodyzone, Spa Kora, BIPS","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T05:15:00.000Z","end":"2026-04-21T06:00:00.000Z","title":"Audit of Group Classes message (sent last Saturday)","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:00:00.000Z","end":"2026-04-21T07:30:00.000Z","title":"Create Calling SOP + upgrade official pitch","desc":"Covers monitoring, training triggers, consequences, pitch evaluation, and delivery standards. Refine and upgrade official pitch based on best-performing scripts."},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T07:30:00.000Z","end":"2026-04-21T08:15:00.000Z","title":"BIPS Magazine — Written Content","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:15:00.000Z","end":"2026-04-21T08:45:00.000Z","title":"BIPS Magazine — Arranged Pictures","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T08:45:00.000Z","end":"2026-04-21T09:30:00.000Z","title":"BIPS Magazine — Designed","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T09:30:00.000Z","end":"2026-04-21T10:00:00.000Z","title":"BIPS Magazine — Compiled","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:00:00.000Z","end":"2026-04-21T10:20:00.000Z","title":"Found free live hosting for CMD Intelligence Bot","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:20:00.000Z","end":"2026-04-21T10:50:00.000Z","title":"Debugged CMD Intelligence Bot for live hosting","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T10:50:00.000Z","end":"2026-04-21T12:25:00.000Z","title":"AI Agents Meeting with CMD Sir @ Bodyzone","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T12:30:00.000Z","end":"2026-04-21T12:56:00.000Z","title":"AI Bot Meeting with Joshvir","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T04:25:00.000Z","end":"2026-04-22T04:55:00.000Z","title":"Handled CMD Sir's LinkedIn Account","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T04:55:00.000Z","end":"2026-04-22T05:30:00.000Z","title":"Updated 3 PPTs (HO, Bodyzone, Spa Kora)","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T05:25:00.000Z","end":"2026-04-22T06:00:00.000Z","title":"Explained Callers' SOPs with Raj","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T07:00:00.000Z","end":"2026-04-22T07:20:00.000Z","title":"Arranged CMD's Meetings with Patiala Media","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T08:00:00.000Z","end":"2026-04-22T08:30:00.000Z","title":"Lunch","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T08:30:00.000Z","end":"2026-04-22T09:30:00.000Z","title":"Talked to Patiala Media Houses","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:30:00.000Z","end":"2026-04-22T09:55:00.000Z","title":"Year-Round Media Campaign Strategy (Digital + Social + Print)","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T09:55:00.000Z","end":"2026-04-22T10:25:00.000Z","title":"Delivered A4 copy for BIPS Magazine (with Ayush)","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T10:20:00.000Z","end":"2026-04-22T10:40:00.000Z","title":"Shared Calling Report of All Callers","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T10:40:00.000Z","end":"2026-04-22T11:00:00.000Z","title":"Audited Walk-in Report","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:00:00.000Z","end":"2026-04-22T11:25:00.000Z","title":"AI Tool Dev — Freelancer PT Entry Mapping (Bodyzone)","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:25:00.000Z","end":"2026-04-22T11:45:00.000Z","title":"Audited Harjit's Work","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:45:00.000Z","end":"2026-04-22T12:10:00.000Z","title":"Hoarding Vendor — Full & Final Coordination","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T12:10:00.000Z","end":"2026-04-22T12:30:00.000Z","title":"Physical Check — Delegation Issues from Yesterday","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T04:00:00.000Z","end":"2026-04-23T04:30:00.000Z","title":"Coordination with Double Tick","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T04:30:00.000Z","end":"2026-04-23T09:30:00.000Z","title":"📋 Delegation Audit – Reports & Meetings (Morning, SK, BZ) + Media Coordination","desc":"Delegation Audit Report — Covered:\n• Morning delegation review\n• Spa Kora (SK) meeting\n• Bodyzone (BZ) meeting\n\nAdditional activities:\n• Coordinated with Patiala media\n• Arranged 3 meetings successfully\n• Postponed 1 meeting to 24th April 2026"},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:30:00.000Z","end":"2026-04-23T10:00:00.000Z","title":"🤝 Meeting – Arun Sir | PT-Freelancers Tracing Automation","desc":"Discussion with Arun Sir on automating the tracing process for PT (Part-Time) Freelancers.\nAgenda: Identify tracking gaps, propose AI/automation solution, define next steps."},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:50:00.000Z","end":"2026-04-23T11:30:00.000Z","title":"🤖 GCS AI Automation Master Project – Planning & Scoping","desc":"Task: Create a comprehensive AI automation project covering GCS HO, BIPS, Bodyzone, and Spa Kora.\n\nScope: All possible areas including —\n• Operations: Scheduling, reporting, delegation tracking, attendance, procurement\n• Strategy: CMD Intelligence Dashboard, performance analytics, growth projections\n• HR & Admin: Onboarding, documentation, FnF automation\n• Sales & Marketing: WhatsApp AI agents, outbound calling, lead tracking\n• Education (BIPS): AI teaching tools, result communications, parent engagement\n• Fitness & Wellness (Bodyzone/Spa Kora): Member management, booking, retention agents\n\nTimeline to be defined with milestones and tool assignments (n8n, WATI, Exotel, Gemini, etc.)"},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T11:30:00.000Z","end":"2026-04-23T12:00:00.000Z","title":"📞 Call Audit","desc":"Call audit session — Review of calls made/received across GCS verticals. Quality check, follow-up identification, and action logging."},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T12:00:00.000Z","end":"2026-04-23T12:50:00.000Z","title":"📊 Presentation to CMD & BIPS Team – Next Year Marketing Plan","desc":"Presentation delivered to CMD Gurmeet Singh Arora and the BIPS team.\nTopic: Next Year's Marketing Plan for BIPS\nCovered: Strategic marketing directions, channels, campaigns, and goals for the upcoming academic year."},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T12:50:00.000Z","end":"2026-04-23T13:20:00.000Z","title":"checklist marking","desc":null}]}},"Gunjan":{"color":"#84cc16","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-15T18:30:00.000Z","end":"2026-04-16T18:30:00.000Z","title":"Today's calendar ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:00:00.000Z","end":"2026-04-16T06:15:00.000Z","title":"Leads posting, Leads entries (Bz, Spa kora, bips)","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:00:00.000Z","end":"2026-04-16T06:15:00.000Z","title":"Prepared daily leads report  and shared it vikram sir","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:15:00.000Z","end":"2026-04-16T07:00:00.000Z","title":"Updated Bz yesterday pending remarks.","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:00:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"Updated today Gcs Ho and drivers   Attendance entry in google sheet","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:40:00.000Z","end":"2026-04-16T08:20:00.000Z","title":"Lunch time ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:22:00.000Z","end":"2026-04-16T12:45:00.000Z","title":"Leads posting, Leads entries (Bz, Spa kora, Ght, Bips) Update remarks (Bodyzone), Whatsapp chatbot, Whatsapp sheets, Website leads ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:15:00.000Z","end":"2026-04-16T09:30:00.000Z","title":"Shared pending leads of Bodyzone In bz whatsapp inquiry group","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:30:00.000Z","end":"2026-04-16T10:15:00.000Z","title":"Update direct walk-ins, Memberships form in crm (Bodyzone)","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T10:15:00.000Z","end":"2026-04-16T11:00:00.000Z","title":"Updated today's bips remarks, Shared by Ashima mam.","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:00:00.000Z","end":"2026-04-16T11:45:00.000Z","title":"Updated Bz today's remarks ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:15:00.000Z","end":"2026-04-16T11:25:00.000Z","title":"\t Share the total count of Direct Walkin inquiries report with Amit sir. (Bodyzone","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:45:00.000Z","end":"2026-04-16T12:45:00.000Z","title":"Add all the links for all Delegation completed tasks, in another Google Sheet from the dashboard, Along with posting n remarks","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:15:00.000Z","end":"2026-04-16T13:00:00.000Z","title":"BodyzoneUpdated follow-ups remarks in crm ()","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:45:00.000Z","end":"2026-04-16T13:15:00.000Z","title":"Marked my checklist, Posting, Remarks","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T14:15:00.000Z","end":"2026-04-16T15:00:00.000Z","title":" Entered Survey Leads Data in Bips crm {Leads shared by Harjit sir}","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T15:30:00.000Z","end":"2026-04-16T16:00:00.000Z","title":"update job leads data in- Interviews google form- Head office Sheet { ForJob leads}","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T16:15:00.000Z","end":"2026-04-16T16:45:00.000Z","title":"Checked Facebook total leads received vs total leads entered in the CRM from last Saturday to till now (Bodyzone)","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T17:00:00.000Z","end":"2026-04-16T17:30:00.000Z","title":"Worked on today's out-of-city leads and updated them all in CRM","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T06:15:00.000Z","end":"2026-04-17T07:00:00.000Z","title":"Updated Bz yesterday pending remarks & Today's remarks.","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T04:00:00.000Z","end":"2026-04-20T05:00:00.000Z","title":"Leads posting for all verticals (Spa, Bz, Bips)","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T05:00:00.000Z","end":"2026-04-20T06:00:00.000Z","title":"Leads entry for all verticals  (Sunday/ Monday leads )","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T06:15:00.000Z","end":"2026-04-20T07:30:00.000Z","title":"Updated Bz pending remarks. (18/04/2026 After 6:30pm )","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T07:00:00.000Z","end":"2026-04-20T07:30:00.000Z","title":"Updated bips visit in crm","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:00:00.000Z","end":"2026-04-20T11:15:00.000Z","title":"Updated Bz remarks Shared by Ashima mam ","desc":null}],"2026-04-21":[{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T06:15:00.000Z","end":"2026-04-21T07:00:00.000Z","title":"Updated Bz yesterday pending remarks. (After 6:30pm)","desc":null},{"date":"2026-04-20T18:30:00.000Z","start":"2026-04-21T11:45:00.000Z","end":"2026-04-21T12:30:00.000Z","title":"Updated follow-ups remarks from 18 to 20/04/2026. (Remarks shared by Naman sir in Bz pending follow-up group)","desc":null}],"2026-04-22":[{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T06:15:00.000Z","end":"2026-04-22T07:00:00.000Z","title":"Updated Bz yesterday pending remarks (After 6:30pm)","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:15:00.000Z","end":"2026-04-22T12:30:00.000Z","title":"Entered Bips visit + Registration + Admission forms in Bips Crm, Form shared y Poonam Mam in Bips walkin group ","desc":null},{"date":"2026-04-21T18:30:00.000Z","start":"2026-04-22T11:45:00.000Z","end":"2026-04-22T12:45:00.000Z","title":"Updated Bz today's remarks, Shared by Naman sir","desc":null}],"2026-04-23":[{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T09:30:00.000Z","end":"2026-04-23T10:30:00.000Z","title":"Entered Bips Walkin forms in Bips cr. (form shared by Poonam mam)","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T11:00:00.000Z","end":"2026-04-23T12:30:00.000Z","title":"Updated Bz fresh leads remarks ","desc":null},{"date":"2026-04-22T18:30:00.000Z","start":"2026-04-23T11:15:00.000Z","end":"2026-04-23T12:30:00.000Z","title":"Updated  pending follow-up remarks from 21 April to till date","desc":null}]}},"Santosh K":{"color":"#e11d48","byDate":{"2026-04-16":[{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:15:00.000Z","end":"2026-04-16T04:45:00.000Z","title":"Reviewed all the day’s tasks.","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T04:45:00.000Z","end":"2026-04-16T05:15:00.000Z","title":"Coordinate with Mr Manvinder and provide Passport of Jasnam","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T05:15:00.000Z","end":"2026-04-16T05:45:00.000Z","title":"Verified Jharkhand Salary","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:05:00.000Z","end":"2026-04-16T06:30:00.000Z","title":"ALL HOD's Meeting","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T06:30:00.000Z","end":"2026-04-16T07:00:00.000Z","title":"Review Gurishjas Renovation Progress and BIPS construction ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:00:00.000Z","end":"2026-04-16T07:30:00.000Z","title":"Coordinate with Harjeet ji and Deeksha","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T07:45:00.000Z","end":"2026-04-16T08:30:00.000Z","title":"Lunch","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T08:30:00.000Z","end":"2026-04-16T09:45:00.000Z","title":"Filter CVs for Fitness Couselor","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T09:45:00.000Z","end":"2026-04-16T10:30:00.000Z","title":"HR Operation work","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T10:30:00.000Z","end":"2026-04-16T11:00:00.000Z","title":"Coordinate with Ultra Tech cement vendor for purchase ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:00:00.000Z","end":"2026-04-16T11:45:00.000Z","title":"Entries in  exist form of employees","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T11:45:00.000Z","end":"2026-04-16T12:15:00.000Z","title":"Coordinated with Mr Vikram for creative of Floor manager ","desc":null},{"date":"2026-04-15T18:30:00.000Z","start":"2026-04-16T12:15:00.000Z","end":"2026-04-16T12:45:00.000Z","title":"marked delegation and checklist","desc":null}],"2026-04-17":[{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T04:45:00.000Z","end":"2026-04-17T06:00:00.000Z","title":"Working on Jasnam's  US Visa","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T07:00:00.000Z","end":"2026-04-17T07:45:00.000Z","title":"Full and final payment of Ms Anjana","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T08:30:00.000Z","end":"2026-04-17T09:15:00.000Z","title":"PO Ultra Tech cement","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T09:30:00.000Z","end":"2026-04-17T10:30:00.000Z","title":"Communicated with Deepmala ma'am for desposable comb and Spa Kora Uniform ","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T10:30:00.000Z","end":"2026-04-17T11:30:00.000Z","title":"Coordinated with staff for OTP and for some printouts.","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T11:30:00.000Z","end":"2026-04-17T12:00:00.000Z","title":"searching Airlines for US","desc":null},{"date":"2026-04-16T18:30:00.000Z","start":"2026-04-17T12:00:00.000Z","end":"2026-04-17T12:30:00.000Z","title":"HR operational work includes leave and short leave approval.","desc":null}],"2026-04-20":[{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T04:45:00.000Z","end":"2026-04-20T05:15:00.000Z","title":"Conducted the first round of interview for Pritam Roy for the Floor Manager position.","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T05:15:00.000Z","end":"2026-04-20T05:45:00.000Z","title":"Followed up with Mr. Goti regarding the payment.","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T07:00:00.000Z","end":"2026-04-20T07:45:00.000Z","title":"Scheduled the final round of interview for Mr. Pritam Roy with CMD Sir.","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T08:30:00.000Z","end":"2026-04-20T09:15:00.000Z","title":"Filtered 10 candidates’ CVs for the interview.","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:15:00.000Z","end":"2026-04-20T09:45:00.000Z","title":"HR Operation work leave approval","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T09:45:00.000Z","end":"2026-04-20T10:15:00.000Z","title":"Conducted the first round of interview for Mr. Eshan.","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T10:15:00.000Z","end":"2026-04-20T11:00:00.000Z","title":"Conducted the first round of interview for Parmod Verma.","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:00:00.000Z","end":"2026-04-20T11:45:00.000Z","title":"Full and Final Hitisha","desc":null},{"date":"2026-04-19T18:30:00.000Z","start":"2026-04-20T11:45:00.000Z","end":"2026-04-20T12:15:00.000Z","title":"Interview arranged with CMD Sir for Parmod Verma.","desc":null}]}}};
-
-function parseISOtoDate(s) {
-  if (!s) return null;
-  return new Date(s);
-}
-
-function fmtTime(s) {
-  if (!s) return '';
-  const d = new Date(s);
-  return d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
-}
-
-function renderForDate(selectedDate) {
-  let totalTasks = 0, activeCount = 0, busiestName = '', busiestCount = 0;
-  const insights = [];
-
-  let cardsHTML = '';
-  for (const [name, data] of Object.entries(EMP_DATA)) {
-    const tasks = (data.byDate && data.byDate[selectedDate]) || [];
-    const count = tasks.length;
-    totalTasks += count;
-    if (count > 0) activeCount++;
-    if (count > busiestCount) { busiestCount = count; busiestName = name; }
-
-    let tasksHTML = '';
-    if (count === 0) {
-      tasksHTML = '<div class="no-tasks"><div class="no-tasks-icon">😴</div><div>No tasks logged</div></div>';
-    } else {
-      tasks.forEach(t => {
-        const startStr = t.start ? fmtTime(t.start) : '';
-        const endStr = t.end ? fmtTime(t.end) : '';
-        const timeLabel = startStr ? (endStr ? startStr + ' – ' + endStr : startStr) : '';
-        tasksHTML += '<div class="task-item">' +
-          (timeLabel ? '<div class="task-time"><span class="task-time-dot" style="background:' + data.color + '"></span>' + timeLabel + '</div>' : '') +
-          '<div class="task-title">' + (t.title || '(No title)') + '</div>' +
-          (t.desc ? '<div class="task-desc">' + t.desc + '</div>' : '') +
-          '</div>';
-      });
+function filterDate(date) {
+  // Update button states
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.getElementById('btn-' + (date === 'all' ? 'all' : date.replace(/\//g,'-')));
+  if(activeBtn) activeBtn.classList.add('active');
+  
+  // Show/hide date sections
+  document.querySelectorAll('.date-section').forEach(s => {
+    if(date === 'all') s.classList.remove('filtered-hidden');
+    else {
+      const matches = s.classList.contains('date-' + date.replace(/\//g,'-'));
+      s.classList.toggle('filtered-hidden', !matches);
     }
-
-    const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    cardsHTML += '<div class="card">' +
-      '<div class="card-header">' +
-        '<div class="avatar" style="background:' + data.color + '">' + initials + '</div>' +
-        '<div><div class="card-name">' + name + '</div><div class="card-count">' + count + ' task' + (count!==1?'s':'') + ' logged</div></div>' +
-      '</div>' +
-      '<div class="card-body">' + tasksHTML + '</div>' +
-      '</div>';
+  });
+  
+  // Show/hide employee cards with no visible tasks
+  if(date !== 'all') {
+    document.querySelectorAll('.emp-card').forEach(card => {
+      const visible = Array.from(card.querySelectorAll('.date-section')).some(s => !s.classList.contains('filtered-hidden') && s.querySelectorAll('.task-item').length > 0);
+      card.classList.toggle('hidden', !visible);
+    });
+  } else {
+    document.querySelectorAll('.emp-card').forEach(c => c.classList.remove('hidden'));
   }
-
-  document.getElementById('teamGrid').innerHTML = cardsHTML;
-
-  // Update stats
-  document.getElementById('statActive').textContent = activeCount;
-  document.getElementById('statTasks').textContent = totalTasks;
-  document.getElementById('statAvg').textContent = activeCount > 0 ? (totalTasks/activeCount).toFixed(1) : '0';
-  document.getElementById('statBusiest').textContent = busiestName ? busiestName.split(' ')[0] : '—';
-
-  // Insights
-  const dateLabel = new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  document.getElementById('gridTitle').textContent = '👥 Team Activity — ' + dateLabel;
-
-  let insightsHTML = '<h3>🤖 AI Insights — ' + dateLabel + '</h3><div class="insights-grid">' +
-    '<div class="insight-item"><div class="insight-label">Participation Rate</div><div class="insight-value">' + Math.round(activeCount/12*100) + '%</div><div class="insight-sub">' + activeCount + ' of 12 members active</div></div>' +
-    '<div class="insight-item"><div class="insight-label">Top Contributor</div><div class="insight-value">' + (busiestName || '—') + '</div><div class="insight-sub">' + busiestCount + ' tasks logged</div></div>' +
-    '<div class="insight-item"><div class="insight-label">Total Work Items</div><div class="insight-value">' + totalTasks + '</div><div class="insight-sub">Across all members</div></div>' +
-    '<div class="insight-item"><div class="insight-label">Avg Load</div><div class="insight-value">' + (activeCount > 0 ? (totalTasks/activeCount).toFixed(1) : '0') + '</div><div class="insight-sub">Tasks per active member</div></div>' +
-    '</div>';
-
-  // Inactive members
-  const inactive = Object.entries(EMP_DATA).filter(([n,d]) => !((d.byDate && d.byDate[selectedDate]) && d.byDate[selectedDate].length > 0)).map(([n])=>n);
-  if (inactive.length > 0) {
-    insightsHTML += '<div style="margin-top:14px;font-size:0.8rem;color:#64748b;">⚠️ No tasks logged: <span style="color:#f59e0b">' + inactive.join(', ') + '</span></div>';
-  }
-
-  document.getElementById('insightsSection').innerHTML = insightsHTML;
 }
-
-// Init
-const now = new Date();
-document.getElementById('updateTime').textContent = 'Updated: ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
-document.getElementById('footerTime').textContent = 'Generated ' + now.toLocaleString('en-IN');
-
-const sel = document.getElementById('dateSelect');
-renderForDate(sel.value);
 </script>
 </body>
 </html>
