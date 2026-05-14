@@ -2,1374 +2,550 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GCS Team Daily Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GCS Team Daily Report – 14/05/2026</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #2d3748; }
-  .header { background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); color: white; padding: 24px 32px; }
-  .header h1 { font-size: 1.8rem; font-weight: 700; }
-  .header .subtitle { opacity: 0.85; margin-top: 4px; font-size: 0.95rem; }
-  .header .meta { margin-top: 8px; font-size: 0.8rem; opacity: 0.7; }
-  .controls { background: white; padding: 16px 32px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-  .controls label { font-weight: 600; font-size: 0.9rem; }
-  .controls select, .controls input { padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.9rem; }
-  .controls button { padding: 8px 16px; background: #2b6cb0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
-  .controls button:hover { background: #2c5282; }
-  .summary-bar { display: flex; gap: 16px; padding: 16px 32px; background: white; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
-  .summary-stat { text-align: center; }
-  .summary-stat .num { font-size: 1.5rem; font-weight: 700; color: #2b6cb0; }
-  .summary-stat .lbl { font-size: 0.75rem; color: #718096; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; padding: 24px 32px; }
-  .emp-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; transition: box-shadow 0.2s; }
-  .emp-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
-  .emp-card.hidden { display: none; }
-  .emp-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #ebf8ff; border-bottom: 1px solid #bee3f8; }
-  .emp-avatar { width: 44px; height: 44px; border-radius: 50%; background: #2b6cb0; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; flex-shrink: 0; }
-  .emp-info h3 { font-size: 1rem; font-weight: 700; }
-  .emp-stats { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-  .stat-badge { font-size: 0.72rem; background: #bee3f8; color: #2c5282; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
-  .stat-badge.recent { background: #c6f6d5; color: #22543d; }
-  .emp-insight { padding: 10px 16px; background: #fffff0; border-bottom: 1px solid #fefcbf; font-size: 0.82rem; color: #744210; }
-  .task-list { padding: 12px 16px; max-height: 280px; overflow-y: auto; }
-  .task-item { padding: 8px 0; border-bottom: 1px solid #f7fafc; }
-  .task-item:last-child { border-bottom: none; }
-  .task-date { font-size: 0.72rem; color: #718096; font-weight: 600; }
-  .task-title { font-size: 0.88rem; font-weight: 600; margin: 2px 0; color: #2d3748; }
-  .task-time { font-size: 0.75rem; color: #4a5568; }
-  .task-desc { font-size: 0.78rem; color: #718096; margin-top: 2px; font-style: italic; }
-  .no-tasks { color: #a0aec0; font-size: 0.85rem; text-align: center; padding: 20px; }
-  .footer { text-align: center; padding: 24px; color: #718096; font-size: 0.8rem; background: white; margin-top: 24px; border-top: 1px solid #e2e8f0; }
-  @media (max-width: 600px) { .grid { padding: 12px; } .header { padding: 16px; } }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #F1F5F9; color: #1E293B; min-height: 100vh; }
+
+/* Header */
+.header { background: linear-gradient(135deg, #1E3A8A 0%, #4F46E5 100%); color: white; padding: 28px 32px; box-shadow: 0 4px 20px rgba(0,0,0,.2); }
+.header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.logo-area h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; }
+.logo-area p { font-size: 0.85rem; opacity: .8; margin-top: 4px; }
+.header-meta { text-align: right; font-size: 0.8rem; opacity: .85; }
+.header-meta strong { display: block; font-size: 1rem; opacity: 1; }
+
+/* Stats bar */
+.stats-bar { background: white; border-bottom: 1px solid #E2E8F0; padding: 16px 32px; }
+.stats-inner { max-width: 1400px; margin: 0 auto; display: flex; gap: 32px; flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; align-items: center; }
+.stat-val { font-size: 1.8rem; font-weight: 700; color: #4F46E5; line-height: 1; }
+.stat-lbl { font-size: 0.72rem; color: #64748B; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+
+/* Controls */
+.controls { max-width: 1400px; margin: 24px auto; padding: 0 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.search-box { flex: 1; min-width: 200px; padding: 10px 16px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 0.9rem; background: white; outline: none; transition: border-color .2s; }
+.search-box:focus { border-color: #4F46E5; }
+.filter-btn { padding: 10px 18px; border: 1.5px solid #E2E8F0; border-radius: 8px; background: white; font-size: 0.85rem; cursor: pointer; transition: all .2s; color: #475569; }
+.filter-btn.active, .filter-btn:hover { background: #4F46E5; color: white; border-color: #4F46E5; }
+
+/* Grid */
+.grid { max-width: 1400px; margin: 0 auto; padding: 0 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+/* Cards */
+.emp-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.07); transition: transform .2s, box-shadow .2s; }
+.emp-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+.emp-card.hidden { display: none; }
+.card-header { padding: 18px 20px; display: flex; align-items: center; gap: 14px; color: white; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; flex-shrink: 0; }
+.emp-info { flex: 1; }
+.emp-name { font-weight: 700; font-size: 1rem; }
+.emp-meta { font-size: 0.75rem; opacity: .85; margin-top: 3px; }
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+.today-badge { background: #10B981; color: white; }
+.recent-badge { background: rgba(255,255,255,.25); color: white; }
+
+.card-body { padding: 16px 20px; max-height: 320px; overflow-y: auto; }
+.task-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F1F5F9; }
+.task-item:last-child { border-bottom: none; }
+.task-time { font-size: 0.72rem; color: #94A3B8; white-space: nowrap; padding-top: 2px; min-width: 90px; font-weight: 500; }
+.task-content { flex: 1; }
+.task-title { font-size: 0.875rem; font-weight: 600; color: #1E293B; line-height: 1.4; }
+.task-desc { font-size: 0.78rem; color: #64748B; margin-top: 4px; line-height: 1.4; }
+.no-tasks { font-size: 0.85rem; color: #94A3B8; text-align: center; padding: 20px 0; }
+
+/* Footer */
+.footer { text-align: center; padding: 20px; font-size: 0.78rem; color: #94A3B8; }
+
+@media (max-width: 600px) {
+  .header { padding: 20px 16px; }
+  .grid { padding: 0 12px 32px; grid-template-columns: 1fr; }
+  .controls { padding: 0 12px; }
+}
 </style>
 </head>
 <body>
+
 <div class="header">
-  <h1>🏢 GCS Team Daily Report</h1>
-  <div class="subtitle">Global Care Solutions — Team Calendar Dashboard</div>
-  <div class="meta">Generated: 12/5/2026, 1:18:37 pm | 12 May 2026</div>
+  <div class="header-inner">
+    <div class="logo-area">
+      <h1>🏢 GCS Team Daily Report</h1>
+      <p>Generated on Thursday, 14 May 2026 at 1:15 pm IST</p>
+    </div>
+    <div class="header-meta">
+      <strong>14/05/2026</strong>
+      Daily Activity Dashboard
+    </div>
+  </div>
 </div>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-val">12</div><div class="stat-lbl">Team Members</div></div>
+    <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Active Today</div></div>
+    <div class="stat"><div class="stat-val">39</div><div class="stat-lbl">Tasks (Recent)</div></div>
+    <div class="stat"><div class="stat-val">1038</div><div class="stat-lbl">Total Logged</div></div>
+  </div>
+</div>
+
 <div class="controls">
-  <label>Filter by Date:</label>
-  <select id="dateFilter" onchange="filterByDate(this.value)">
-    <option value="">— All Dates —</option>
-    <option value="11 May 2026">11 May 2026</option><option value="09 May 2026">09 May 2026</option><option value="08 May 2026">08 May 2026</option><option value="07 May 2026">07 May 2026</option><option value="06 May 2026">06 May 2026</option><option value="05 May 2026">05 May 2026</option><option value="04 May 2026">04 May 2026</option><option value="02 May 2026">02 May 2026</option><option value="01 May 2026">01 May 2026</option><option value="30 Apr 2026">30 Apr 2026</option><option value="29 Apr 2026">29 Apr 2026</option><option value="28 Apr 2026">28 Apr 2026</option><option value="27 Apr 2026">27 Apr 2026</option><option value="25 Apr 2026">25 Apr 2026</option><option value="24 Apr 2026">24 Apr 2026</option><option value="23 Apr 2026">23 Apr 2026</option><option value="22 Apr 2026">22 Apr 2026</option><option value="21 Apr 2026">21 Apr 2026</option><option value="20 Apr 2026">20 Apr 2026</option><option value="19 Apr 2026">19 Apr 2026</option><option value="18 Apr 2026">18 Apr 2026</option><option value="17 Apr 2026">17 Apr 2026</option><option value="16 Apr 2026">16 Apr 2026</option>
-  </select>
-  <label>Search:</label>
-  <input type="text" id="searchBox" placeholder="Search employee or task..." oninput="filterBySearch(this.value)">
-  <button onclick="resetFilters()">Reset</button>
+  <input class="search-box" type="text" id="search" placeholder="🔍  Search by name or task..." oninput="filterCards()">
+  <button class="filter-btn active" id="btn-all" onclick="setFilter('all')">All Members</button>
+  <button class="filter-btn" id="btn-today" onclick="setFilter('today')">Today Only</button>
 </div>
-<div class="summary-bar">
-  <div class="summary-stat"><div class="num" id="statEmployees">12</div><div class="lbl">Employees</div></div>
-  <div class="summary-stat"><div class="num" id="statTasks">1001</div><div class="lbl">Total Tasks</div></div>
-  <div class="summary-stat"><div class="num" id="statVisible">12</div><div class="lbl">Visible Cards</div></div>
-  <div class="summary-stat"><div class="num">01:18 pm</div><div class="lbl">Report Time</div></div>
+
+<div class="grid" id="grid">
+
+  <div class="emp-card" data-name="mehak" data-date="12/05/2026">
+    <div class="card-header" style="background:#4F46E5">
+      <div class="avatar">M</div>
+      <div class="emp-info">
+        <div class="emp-name">Mehak</div>
+        <div class="emp-meta">1 task &bull; 37 total logged</div>
+      </div>
+      <span class="badge recent-badge">12/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">5:00 PM – 6:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">CRM checking for BIPS</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="rajinder" data-date="08/05/2026">
+    <div class="card-header" style="background:#7C3AED">
+      <div class="avatar">R</div>
+      <div class="emp-info">
+        <div class="emp-name">Rajinder</div>
+        <div class="emp-meta">6 tasks &bull; 107 total logged</div>
+      </div>
+      <span class="badge recent-badge">08/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">10:30 AM – 2:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Strategic meeting</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:45 PM – 3:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">Data provided to Vivek last one year ex members data and old remarks are manually mapped.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">3:30 PM – 4:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">PT all data compile to figure active PT count and who did not renewed</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">4:30 PM – 5:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Bills/loan checklist added in team square for accountants</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">5:00 PM – 5:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">Bus routes optimization ai analysis report prepared for bips</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">5:30 PM – 6:35 PM</div>
+        <div class="task-content">
+          <div class="task-title">Dashboard meeting with cmd sir</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="priyanka" data-date="13/05/2026">
+    <div class="card-header" style="background:#DB2777">
+      <div class="avatar">P</div>
+      <div class="emp-info">
+        <div class="emp-name">Priyanka</div>
+        <div class="emp-meta">1 task &bull; 121 total logged</div>
+      </div>
+      <span class="badge recent-badge">13/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">3:15 PM – 3:45 PM</div>
+        <div class="task-content">
+          <div class="task-title">Offline Accounts Statutory compliances Review</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="arun sharma" data-date="13/05/2026">
+    <div class="card-header" style="background:#059669">
+      <div class="avatar">AS</div>
+      <div class="emp-info">
+        <div class="emp-name">Arun Sharma</div>
+        <div class="emp-meta">1 task &bull; 85 total logged</div>
+      </div>
+      <span class="badge recent-badge">13/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">9:00 AM – 10:00 AM</div>
+        <div class="task-content">
+          <div class="task-title">jio  broadband md sir house</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="boney" data-date="07/05/2026">
+    <div class="card-header" style="background:#D97706">
+      <div class="avatar">B</div>
+      <div class="emp-info">
+        <div class="emp-name">Boney</div>
+        <div class="emp-meta">1 task &bull; 170 total logged</div>
+      </div>
+      <span class="badge recent-badge">07/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">11:00 AM – 1:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">📰 Media Meeting — Camera & Call Audit Coordination</div>
+          <div class="task-desc">Media</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="gunjan" data-date="13/05/2026">
+    <div class="card-header" style="background:#2563EB">
+      <div class="avatar">G</div>
+      <div class="emp-info">
+        <div class="emp-name">Gunjan</div>
+        <div class="emp-meta">3 tasks &bull; 70 total logged</div>
+      </div>
+      <span class="badge recent-badge">13/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">9:30 AM – 11:45 AM</div>
+        <div class="task-content">
+          <div class="task-title">Leads posting, Leads entries (Bz, Spa kora, bips) (Crm / Gymex)</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">11:45 AM – 12:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">Updated Bz fresh leads remarks in Crm and Gymex Software.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">3:00 PM – 6:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Updated Bz today's remarks in Crm and Gymex</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="ayush" data-date="13/05/2026">
+    <div class="card-header" style="background:#DC2626">
+      <div class="avatar">A</div>
+      <div class="emp-info">
+        <div class="emp-name">Ayush</div>
+        <div class="emp-meta">2 tasks &bull; 92 total logged</div>
+      </div>
+      <span class="badge recent-badge">13/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">12:00 PM – 1:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Bodyzone Creatives Revised</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:00 PM – 6:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Spa Kora Creatives</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="diksha" data-date="16/04/2026">
+    <div class="card-header" style="background:#0891B2">
+      <div class="avatar">D</div>
+      <div class="emp-info">
+        <div class="emp-name">Diksha</div>
+        <div class="emp-meta">2 tasks &bull; 2 total logged</div>
+      </div>
+      <span class="badge recent-badge">16/04/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">11:35 AM – 12:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Daily HO meeting</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">1:10 PM – 1:50 PM</div>
+        <div class="task-content">
+          <div class="task-title">Lunch Break</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="santosh k" data-date="20/04/2026">
+    <div class="card-header" style="background:#65A30D">
+      <div class="avatar">SK</div>
+      <div class="emp-info">
+        <div class="emp-name">Santosh K</div>
+        <div class="emp-meta">9 tasks &bull; 29 total logged</div>
+      </div>
+      <span class="badge recent-badge">20/04/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">10:15 AM – 10:45 AM</div>
+        <div class="task-content">
+          <div class="task-title">Conducted the first round of interview for Pritam Roy for the Floor Manager position.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">10:45 AM – 11:15 AM</div>
+        <div class="task-content">
+          <div class="task-title">Followed up with Mr. Goti regarding the payment.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">12:30 PM – 1:15 PM</div>
+        <div class="task-content">
+          <div class="task-title">Scheduled the final round of interview for Mr. Pritam Roy with CMD Sir.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:00 PM – 2:45 PM</div>
+        <div class="task-content">
+          <div class="task-title">Filtered 10 candidates’ CVs for the interview.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:45 PM – 3:15 PM</div>
+        <div class="task-content">
+          <div class="task-title">HR Operation work leave approval</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">3:15 PM – 3:45 PM</div>
+        <div class="task-content">
+          <div class="task-title">Conducted the first round of interview for Mr. Eshan.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">3:45 PM – 4:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">Conducted the first round of interview for Parmod Verma.</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">4:30 PM – 5:15 PM</div>
+        <div class="task-content">
+          <div class="task-title">Full and Final Hitisha</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">5:15 PM – 5:45 PM</div>
+        <div class="task-content">
+          <div class="task-title">Interview arranged with CMD Sir for Parmod Verma.</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="devinder" data-date="13/05/2026">
+    <div class="card-header" style="background:#9333EA">
+      <div class="avatar">D</div>
+      <div class="emp-info">
+        <div class="emp-name">Devinder</div>
+        <div class="emp-meta">3 tasks &bull; 116 total logged</div>
+      </div>
+      <span class="badge recent-badge">13/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">12:15 PM – 1:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Search negitive comment automatic revert AI tool</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:00 PM – 3:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">Create ppt for how to increase SEO enquries</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">4:45 PM – 5:45 PM</div>
+        <div class="task-content">
+          <div class="task-title">Work on Google ai Studio & make Image to video</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="alok" data-date="12/05/2026">
+    <div class="card-header" style="background:#EA580C">
+      <div class="avatar">A</div>
+      <div class="emp-info">
+        <div class="emp-name">Alok</div>
+        <div class="emp-meta">6 tasks &bull; 119 total logged</div>
+      </div>
+      <span class="badge recent-badge">12/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">10:00 AM – 11:00 AM</div>
+        <div class="task-content">
+          <div class="task-title">prepared bdz and spa kora auidt reprot</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">11:00 AM – 12:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">sales shet update dof bdz and s{Pa kora</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">12:00 PM – 1:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">epf esi payment made and some vendor epayment</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:00 PM – 3:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">audit done of bdz sales sheet</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">3:00 PM – 5:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">therapist incentive prepared</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">5:00 PM – 6:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">broadband payments made and billing bank rec o task mark</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="emp-card" data-name="rohit" data-date="13/05/2026">
+    <div class="card-header" style="background:#0D9488">
+      <div class="avatar">R</div>
+      <div class="emp-info">
+        <div class="emp-name">Rohit</div>
+        <div class="emp-meta">4 tasks &bull; 90 total logged</div>
+      </div>
+      <span class="badge recent-badge">13/05/2026</span>
+    </div>
+    <div class="card-body">
+      
+      <div class="task-item">
+        <div class="task-time">12:00 PM – 1:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">PROVIDE GCS DOCUMENTS TO BONEY SIR</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">2:00 PM – 3:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">UPDATE CASH FLOW MODEL</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">3:30 PM – 5:00 PM</div>
+        <div class="task-content">
+          <div class="task-title">UPDATE BMP SHEET OF BIPS/SOCIETY</div>
+          
+        </div>
+      </div>
+      <div class="task-item">
+        <div class="task-time">5:00 PM – 5:30 PM</div>
+        <div class="task-content">
+          <div class="task-title">MADE VENDOR PAYMENTS OF BIPS / SOCIETY</div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="grid" id="empGrid"><div class="emp-card" data-employee="Mehak">
-      <div class="emp-header">
-        <div class="emp-avatar">M</div>
-        <div class="emp-info">
-          <h3>Mehak</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">36 total tasks</span>
-            <span class="stat-badge recent">36 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">📊 Active CRM work. 🤝 Regular meetings. ✅ Conducting audits. 🏖️ Has leave entries. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">LEAVE FOR 3 HOURS</div>
-        <div class="task-time">11/05/2026 14:00:00 → 11/05/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">CRM checking for BIPS and walkin update </div>
-        <div class="task-time">06/05/2026 17:00:00 → 06/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">01 May 2026</div>
-        <div class="task-title">Half Day</div>
-        <div class="task-time">01/05/2026 14:00:00 → 01/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">29 Apr 2026</div>
-        <div class="task-title">FMS Audit and Entries update </div>
-        <div class="task-time">29/04/2026 17:00:00 → 29/04/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">27 Apr 2026</div>
-        <div class="task-title">Digital Marketing review</div>
-        <div class="task-time">27/04/2026 17:30:00 → 27/04/2026 17:50:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">27 Apr 2026</div>
-        <div class="task-title">offline co ordinations </div>
-        <div class="task-time">27/04/2026 14:30:00 → 27/04/2026 15:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">25 Apr 2026</div>
-        <div class="task-title">SOCIAL HOUR</div>
-        <div class="task-time">25/04/2026 16:00:00 → 25/04/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">25 Apr 2026</div>
-        <div class="task-title">Social Hour </div>
-        <div class="task-time">25/04/2026 16:00:00 → 25/04/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">24 Apr 2026</div>
-        <div class="task-title">offline co ordination</div>
-        <div class="task-time">24/04/2026 14:30:00 → 24/04/2026 15:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">24 Apr 2026</div>
-        <div class="task-title">Daily Meeting: SK and Heads-Bodyzone  </div>
-        <div class="task-time">24/04/2026 13:00:00 → 24/04/2026 13:36:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">24 Apr 2026</div>
-        <div class="task-title">Review Gurishjas Renovation Progress and BIPS construction </div>
-        <div class="task-time">24/04/2026 12:00:00 → 24/04/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">23 Apr 2026</div>
-        <div class="task-title">Off linne follow upsa and co ordinations</div>
-        <div class="task-time">23/04/2026 15:30:00 → 23/04/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">22 Apr 2026</div>
-        <div class="task-title">CRM checking for BIPS and walkins update in sheet </div>
-        <div class="task-time">22/04/2026 17:00:00 → 22/04/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">22 Apr 2026</div>
-        <div class="task-title">offline co ordinatin </div>
-        <div class="task-time">22/04/2026 15:15:00 → 22/04/2026 15:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">21 Apr 2026</div>
-        <div class="task-title">Spa Kora Meeting; (GM, Laxmi, Therapists, Anu, Neha, Raj) Weekly Review  and Rules, processes for Operations</div>
-        <div class="task-time">21/04/2026 16:45:00 → 21/04/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">21 Apr 2026</div>
-        <div class="task-title">Bodyzone Sales Review +EM</div>
-        <div class="task-time">21/04/2026 13:00:00 → 21/04/2026 14:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">21 Apr 2026</div>
-        <div class="task-title">BZ Trainers Weekly Review+EM (enitre operations)</div>
-        <div class="task-time">21/04/2026 12:00:00 → 21/04/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">18 Apr 2026</div>
-        <div class="task-title">CRM checking for BIPS and GHT</div>
-        <div class="task-time">18/04/2026 17:00:00 → 18/04/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">Sending callers report to MD sir </div>
-        <div class="task-time">17/04/2026 18:00:00 → 17/04/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title"> Marking Checklist & Delegation</div>
-        <div class="task-time">17/04/2026 17:30:00 → 17/04/2026 18:00:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Rajinder">
-      <div class="emp-header">
-        <div class="emp-avatar">R</div>
-        <div class="emp-info">
-          <h3>Rajinder</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">106 total tasks</span>
-            <span class="stat-badge recent">106 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">📊 Active CRM work. 🤝 Regular meetings. ✅ Conducting audits. 🏖️ Has leave entries. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Dashboard meeting with cmd sir</div>
-        <div class="task-time">08/05/2026 17:30:00 → 08/05/2026 18:35:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Bus routes optimization ai analysis report prepared for bips </div>
-        <div class="task-time">08/05/2026 17:00:00 → 08/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Bills/loan checklist added in team square for accountants</div>
-        <div class="task-time">08/05/2026 16:30:00 → 08/05/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">PT all data compile to figure active PT count and who did not renewed</div>
-        <div class="task-time">08/05/2026 15:30:00 → 08/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Data provided to Vivek last one year ex members data and old remarks are manually mapped.</div>
-        <div class="task-time">08/05/2026 14:45:00 → 08/05/2026 15:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Strategic meeting</div>
-        <div class="task-time">08/05/2026 10:30:00 → 08/05/2026 14:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Tasks marked in dele/checklist</div>
-        <div class="task-time">06/05/2026 18:30:00 → 06/05/2026 18:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Bodyzone data analysis meeting </div>
-        <div class="task-time">06/05/2026 17:30:00 → 06/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">EM prepared for BIPS teachers - April 2026</div>
-        <div class="task-time">06/05/2026 16:00:00 → 06/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Meeting with Indu mam regarding HOD/Teachers em score</div>
-        <div class="task-time">06/05/2026 15:30:00 → 06/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Yash sale reciepts audited from sales sheet to crm with Boney sir</div>
-        <div class="task-time">06/05/2026 14:45:00 → 06/05/2026 15:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">PT data arranged to gm sir with trainer wise</div>
-        <div class="task-time">06/05/2026 14:00:00 → 06/05/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">PT review meeting</div>
-        <div class="task-time">06/05/2026 12:00:00 → 06/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Spa kora action planning format revised for may 2026</div>
-        <div class="task-time">06/05/2026 11:00:00 → 06/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Action plan sheet updated for april 2026 - spa kora</div>
-        <div class="task-time">06/05/2026 09:30:00 → 06/05/2026 11:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">General Trainers Weekly Review+EM (enitre operations)</div>
-        <div class="task-time">05/05/2026 12:00:00 → 05/05/2026 12:30:00</div>
-        <div class="task-desc">Agenda:
-1. Ensure to take the BMI of all the members in the beginning and on a monthly basis.
-2. Ensure to assign the trainers to each member who come at Bodyzone ( Both the FMs)
-3. Ensure to update the workout schedule of all the members
-4. Ensure to send the Fitness progress to each member on a monthly basis, including their attendance, and BMI progress
-5. Ensure to have the assessment and fitness goal of each members
-6. Work on making the irregular members regular
-7. Trainers to start using the Technical vocabuary with all their members and impress them this week. Generate Reference from atleast 50% of their members</div>
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">CL/DEL tasks marked</div>
-        <div class="task-time">04/05/2026 18:30:00 → 04/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">DM review meeting</div>
-        <div class="task-time">04/05/2026 17:45:00 → 04/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">DM monthly report prepared - april 26</div>
-        <div class="task-time">04/05/2026 16:45:00 → 04/05/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">Meeting - planning of sk and bz</div>
-        <div class="task-time">04/05/2026 15:45:00 → 04/05/2026 16:45:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Priyanka">
-      <div class="emp-header">
-        <div class="emp-avatar">P</div>
-        <div class="emp-info">
-          <h3>Priyanka</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">119 total tasks</span>
-            <span class="stat-badge recent">119 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. ✅ Conducting audits. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Prepared CMD Sir's Calendar</div>
-        <div class="task-time">09/05/2026 16:00:00 → 09/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Reports shared with CMD Sir </div>
-        <div class="task-time">09/05/2026 15:30:00 → 09/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Filled Leadership and Initiative form </div>
-        <div class="task-time">09/05/2026 15:15:00 → 09/05/2026 15:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Gymex Training </div>
-        <div class="task-time">09/05/2026 14:15:00 → 09/05/2026 15:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Updated Approval sheet , check my emails and all whatsapp groups</div>
-        <div class="task-time">09/05/2026 11:00:00 → 09/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Updated to do list and forwarded audios</div>
-        <div class="task-time">09/05/2026 09:30:00 → 09/05/2026 10:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Strategic Meeting </div>
-        <div class="task-time">08/05/2026 10:00:00 → 08/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Mr.Amit's presentation on Data Analysis(Along with Mr.Raj)</div>
-        <div class="task-time">06/05/2026 17:15:00 → 06/05/2026 18:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Ms.Neha's Presentation on Data Analysis(Along with Mr.Boney) </div>
-        <div class="task-time">06/05/2026 16:30:00 → 06/05/2026 17:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title"> Meeting with JSA Team Wednesday, 6 May⋅3:30 – 4:30pm</div>
-        <div class="task-time">06/05/2026 15:30:00 → 06/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Meeting with Personal Trainers </div>
-        <div class="task-time">06/05/2026 12:00:00 → 06/05/2026 12:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Updated To do list , complete delegations, checked all whatsapp groups , MOM's prepared and shared -and updated approval sheet</div>
-        <div class="task-time">05/05/2026 15:45:00 → 05/05/2026 16:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">GT Retention meeting </div>
-        <div class="task-time">05/05/2026 12:00:00 → 05/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Meeting-Strategy to Charge higher price and overcome Subzero</div>
-        <div class="task-time">05/05/2026 10:30:00 → 05/05/2026 11:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Shared Walk, In and Invalid members reports with sir ; filled self initiative form</div>
-        <div class="task-time">02/05/2026 17:00:00 → 02/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Prepared Strategic CMD Cal</div>
-        <div class="task-time">02/05/2026 16:30:00 → 02/05/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Offline Meeting with CMD Sir- Operations / BZ Walk In Forms Discussion & CMD Cal</div>
-        <div class="task-time">02/05/2026 15:45:00 → 02/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Organized Review of Pre Schools </div>
-        <div class="task-time">02/05/2026 15:15:00 → 02/05/2026 15:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Updated To do list, responses from pending approvals shared with doers and tasks delegated</div>
-        <div class="task-time">02/05/2026 12:00:00 → 02/05/2026 13:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Meeting SK Sales Team</div>
-        <div class="task-time">02/05/2026 10:45:00 → 02/05/2026 11:15:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Arun Sharma">
-      <div class="emp-header">
-        <div class="emp-avatar">A</div>
-        <div class="emp-info">
-          <h3>Arun Sharma</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">83 total tasks</span>
-            <span class="stat-badge recent">83 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">#104 for painter material and Plumber Material for roof top and Ishgun section</div>
-        <div class="task-time">09/05/2026 17:00:00 → 09/05/2026 17:50:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Update Billing and freezing requests on gymex</div>
-        <div class="task-time">09/05/2026 16:30:00 → 09/05/2026 16:51:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Update Some features regarding calling status , and source of the leads etc.</div>
-        <div class="task-time">09/05/2026 15:30:00 → 09/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Meeting Training with Gymex team</div>
-        <div class="task-time">09/05/2026 14:30:00 → 09/05/2026 15:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Meeting with Architect at #104 and show them all the work.  Check plumber work at roof and provide them material as required.</div>
-        <div class="task-time">09/05/2026 12:15:00 → 09/05/2026 14:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Coordinate with Mr. Robin and Lakhwainder for the iron  bars at bips</div>
-        <div class="task-time">09/05/2026 12:00:00 → 09/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">check whatsapp msg and mails regarding office work, renovation and construction and others</div>
-        <div class="task-time">09/05/2026 11:00:00 → 09/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">#104 for renovation,change the bathtub in Ishgun washroom</div>
-        <div class="task-time">09/05/2026 09:00:00 → 09/05/2026 11:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Coordinate with all the contractors regarding the meeting at #104 with Architect</div>
-        <div class="task-time">09/05/2026 08:15:00 → 09/05/2026 09:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Coordinate with Carpainter regarding Vanity fitting </div>
-        <div class="task-time">07/05/2026 11:45:00 → 07/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Renew the Gsuite account for the domain thegcsgroup.in</div>
-        <div class="task-time">07/05/2026 11:00:00 → 07/05/2026 11:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">#104 for renovations , Painter requirements and Others </div>
-        <div class="task-time">07/05/2026 08:15:00 → 07/05/2026 10:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Recharge for Jio Fiber recharge  installed at 1279</div>
-        <div class="task-time">06/05/2026 11:30:00 → 06/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">complete checklist and Mark dashboards</div>
-        <div class="task-time">05/05/2026 18:30:00 → 05/05/2026 19:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Get the PO approved from MD Sir regarding Female Spa lockers </div>
-        <div class="task-time">05/05/2026 17:30:00 → 05/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Repair th Microwave extension and Plug </div>
-        <div class="task-time">05/05/2026 16:45:00 → 05/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Check a table fan for MD Sir Study </div>
-        <div class="task-time">05/05/2026 16:00:00 → 05/05/2026 16:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Meeting With MD Sir and Plumber at Spa kora regarding Room Number 4 </div>
-        <div class="task-time">05/05/2026 14:45:00 → 05/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Discuss with Amit Sir and Billing for 30th 2026April, Also update the freezing  request  on Gymex</div>
-        <div class="task-time">05/05/2026 13:45:00 → 05/05/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Discuss with PA  System  Vendor (Onista) and schedule the installation at Bips on 006-05-2026</div>
-        <div class="task-time">05/05/2026 12:00:00 → 05/05/2026 13:00:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Boney">
-      <div class="emp-header">
-        <div class="emp-avatar">B</div>
-        <div class="emp-info">
-          <h3>Boney</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">170 total tasks</span>
-            <span class="stat-badge recent">170 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. ✅ Conducting audits. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">📰 Media Meeting — Camera & Call Audit Coordination</div>
-        <div class="task-time">07/05/2026 11:00:00 → 07/05/2026 13:00:00</div>
-        <div class="task-desc">Media</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🌍 EU Project Meeting</div>
-        <div class="task-time">06/05/2026 18:10:00 → 06/05/2026 18:35:00</div>
-        <div class="task-desc">EU Project / Global Talent meeting — Poland workforce placement discussion.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">📝 BIPS SOPs Update</div>
-        <div class="task-time">06/05/2026 17:30:00 → 06/05/2026 18:10:00</div>
-        <div class="task-desc">Updated Standard Operating Procedures for BIPS vertical.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🏫 BIPS — Last 5 Year Marketing Meeting</div>
-        <div class="task-time">06/05/2026 16:30:00 → 06/05/2026 17:30:00</div>
-        <div class="task-desc">BIPS last 5 years marketing review meeting.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">📋 CMD Audit Task</div>
-        <div class="task-time">06/05/2026 16:00:00 → 06/05/2026 16:30:00</div>
-        <div class="task-desc">Completed audit task assigned by CMD Gurmeet Singh Arora.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">💡 Self-Initiative: Call Audit Metrics Observation</div>
-        <div class="task-time">06/05/2026 15:29:00 → 06/05/2026 16:00:00</div>
-        <div class="task-desc">Self-initiated deep observation and analysis of current call audit metrics — identified gaps and patterns.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">👥 Induction PPT & HR Pitch — New Employees</div>
-        <div class="task-time">06/05/2026 14:39:00 → 06/05/2026 15:29:00</div>
-        <div class="task-desc">Created employee induction PPT and HR pitch deck for new employee onboarding.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">⚖️ RA License & Gov Compliance Research</div>
-        <div class="task-time">06/05/2026 13:49:00 → 06/05/2026 14:39:00</div>
-        <div class="task-desc">Research on Recruiting Agent (RA) license requirements and government compliance under India's Emigration Act 1983 for EU/Poland operations.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🇪🇺 EU Project — PPT Creation</div>
-        <div class="task-time">06/05/2026 12:40:00 → 06/05/2026 13:12:00</div>
-        <div class="task-desc">Created PowerPoint presentation for the EU Project / Global Talent initiative.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🚀 Bodyzone Website — Hosted Live</div>
-        <div class="task-time">06/05/2026 12:10:00 → 06/05/2026 12:40:00</div>
-        <div class="task-desc">Deployed and hosted Bodyzone website live.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">💻 Website Sample — Bodyzone (Design)</div>
-        <div class="task-time">06/05/2026 11:15:00 → 06/05/2026 12:10:00</div>
-        <div class="task-desc">Designed and built website sample for Bodyzone fitness facility.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🔎 Audit — Yash's Uncounted Sales</div>
-        <div class="task-time">06/05/2026 10:40:00 → 06/05/2026 11:15:00</div>
-        <div class="task-desc">Individual review of each uncounted sale by Yash — audit and reconciliation.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🔍 Call Audit</div>
-        <div class="task-time">06/05/2026 09:20:00 → 06/05/2026 10:05:00</div>
-        <div class="task-desc">Daily call audit across verticals.</div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">🔴 PRIORITY — Finish Agent 1: Get WhatsApp template name from vendor</div>
-        <div class="task-time">06/05/2026 09:00:00 → 06/05/2026 09:30:00</div>
-        <div class="task-desc">Chase vendor for approved WhatsApp template name for Bodyzone account. The moment it arrives: open n8n → Bodyzone Lead Conversion Agent workflow → click HTTP Request node → replace "PLACEHOLDER" with real template name → Publish. Agent 1 is then fully live.</div>
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Audited Sales Report Issue </div>
-        <div class="task-time">05/05/2026 17:30:00 → 05/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">✅ Lead Conversion Agent built — pending template name from vendor</div>
-        <div class="task-time">05/05/2026 16:00:00 → 05/05/2026 17:30:00</div>
-        <div class="task-desc">Lead Conversion Agent built in n8n. Flow: Google Sheets Trigger (watches BZ Lead Automation Test sheet) → HTTP Request to RedLava WhatsApp API. Sends instant WhatsApp to every new lead. PENDING: WhatsApp template name from vendor — once received, replace PLACEHOLDER in HTTP node and publish to make fully live.</div>
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">✅ Meta Lead Ads → Google Sheets pipeline — live via Make</div>
-        <div class="task-time">05/05/2026 14:00:00 → 05/05/2026 16:00:00</div>
-        <div class="task-desc">Make scenario built connecting Facebook Lead Ads to Google Sheets. Every new Meta ad lead now auto-appears in BZ Lead Automation Test sheet within 15 minutes — no manual entry by Gunjan required. Scenario is live and active.</div>
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">✅ CMD Morning Brief Bot — live on Telegram, fires 9pm daily</div>
-        <div class="task-time">05/05/2026 12:30:00 → 05/05/2026 13:15:00</div>
-        <div class="task-desc">CMD Intelligence Bot built and published on n8n. Every day at 9pm, CMD receives a Telegram message with: new leads today, conversions (Order Won), hot pipeline count, disqualified leads, not answered leads. Data pulled live from Bodyzone CRM Google Sheet.</div>
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">✅ n8n deployed on Railway — live 24/7, no laptop needed</div>
-        <div class="task-time">05/05/2026 10:00:00 → 05/05/2026 10:30:00</div>
-        <div class="task-desc">n8n workflow automation tool deployed permanently on Railway cloud. URL: n8n-production-b00e4.up.railway.app. No longer dependent on local laptop. Runs 24/7 automatically.</div>
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">⚙️ BZ Process Automation</div>
-        <div class="task-time">04/05/2026 14:00:00 → 04/05/2026 18:00:00</div>
-        <div class="task-desc">Worked on Bodyzone process automation — n8n workflows and system build.</div>
-      </div></div>
-    </div><div class="emp-card" data-employee="Gunjan">
-      <div class="emp-header">
-        <div class="emp-avatar">G</div>
-        <div class="emp-info">
-          <h3>Gunjan</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">65 total tasks</span>
-            <span class="stat-badge recent">65 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">📊 Active CRM work. 🏖️ Has leave entries. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Prepared the AI Bot and TYO leads report and shared it with Ayush Sir.</div>
-        <div class="task-time">11/05/2026 12:00:00 → 11/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Updated Bz fresh n follow-ups remarks.</div>
-        <div class="task-time">11/05/2026 11:15:00 → 11/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Gymex Training </div>
-        <div class="task-time">09/05/2026 15:00:00 → 09/05/2026 15:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Updated job leads remarks, Shared by Santosh mam</div>
-        <div class="task-time">08/05/2026 16:30:00 → 08/05/2026 17:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title"> Entered Survey Leads Data in Bips crm {Lead forms shared by Harjit sir}</div>
-        <div class="task-time">08/05/2026 16:30:00 → 08/05/2026 17:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Leads posting, Leads entries (Bz, Spa kora, Bips) Whatsapp chatbot, Whatsapp sheets, Website leads </div>
-        <div class="task-time">08/05/2026 14:25:00 → 08/05/2026 18:25:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Updated Bz today's fresh leads remarks.</div>
-        <div class="task-time">08/05/2026 11:45:00 → 08/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Updated Bips today's remarks </div>
-        <div class="task-time">08/05/2026 11:45:00 → 08/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Updated Bz yesterday pending follow-up remarks.</div>
-        <div class="task-time">07/05/2026 11:45:00 → 07/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Half day</div>
-        <div class="task-time">06/05/2026 13:10:00 → 06/05/2026 18:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Updated Bz follow-ups n fresh leads remarks.</div>
-        <div class="task-time">06/05/2026 11:15:00 → 06/05/2026 12:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Updated BZ today's walkin forms </div>
-        <div class="task-time">05/05/2026 15:30:00 → 05/05/2026 16:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Updated Bz follow-ups remarks.</div>
-        <div class="task-time">05/05/2026 11:45:00 → 05/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">Entered Bips walkin forms in Bips crm.</div>
-        <div class="task-time">04/05/2026 18:15:00 → 04/05/2026 18:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">Updated Rejected candidates data in nterviews google form- Head office (Responses) sheet</div>
-        <div class="task-time">04/05/2026 15:30:00 → 04/05/2026 16:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">Updated Bz today's n Yesterday remarks.</div>
-        <div class="task-time">04/05/2026 12:00:00 → 04/05/2026 12:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">04 May 2026</div>
-        <div class="task-title">Prepared Ai bot n Tyo leads report and had share it with Ayush sir</div>
-        <div class="task-time">04/05/2026 11:30:00 → 04/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">02 May 2026</div>
-        <div class="task-title">Updated fresh leads remarks (Bz / Bips)</div>
-        <div class="task-time">02/05/2026 12:00:00 → 02/05/2026 12:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">01 May 2026</div>
-        <div class="task-title">Updated Bz pending follow-ups remarks </div>
-        <div class="task-time">01/05/2026 17:30:00 → 01/05/2026 18:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">30 Apr 2026</div>
-        <div class="task-title">Prepared Gopal sir's visit data n shared it with Gopal sir.  (BIPS)</div>
-        <div class="task-time">30/04/2026 17:45:00 → 30/04/2026 18:15:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Ayush">
-      <div class="emp-header">
-        <div class="emp-avatar">A</div>
-        <div class="emp-info">
-          <h3>Ayush</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">88 total tasks</span>
-            <span class="stat-badge recent">88 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Bz Creative For Tyo </div>
-        <div class="task-time">11/05/2026 14:00:00 → 11/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Prepared BZ Creatives TYO </div>
-        <div class="task-time">11/05/2026 12:00:00 → 11/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">HO Meeitng </div>
-        <div class="task-time">11/05/2026 11:30:00 → 11/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Tyo Sharing BZ, Sk , BIPS </div>
-        <div class="task-time">11/05/2026 09:30:00 → 11/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title"> TYO BZ Creative </div>
-        <div class="task-time">09/05/2026 14:00:00 → 09/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">TYO CONTENT CELENDER prepare </div>
-        <div class="task-time">09/05/2026 12:00:00 → 09/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Morning Meeting </div>
-        <div class="task-time">09/05/2026 11:30:00 → 09/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Mothers Day creatives BZ, SK BIPS </div>
-        <div class="task-time">09/05/2026 09:30:00 → 09/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Prepare TYO celender </div>
-        <div class="task-time">08/05/2026 14:00:00 → 08/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Prepare Ai BOT Content </div>
-        <div class="task-time">07/05/2026 16:00:00 → 07/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Prepare TYO content </div>
-        <div class="task-time">07/05/2026 14:00:00 → 07/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Lunch break </div>
-        <div class="task-time">07/05/2026 13:10:00 → 07/05/2026 13:50:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">BIPS CREATIVE </div>
-        <div class="task-time">07/05/2026 12:00:00 → 07/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">BODYZONE OVERVIEW MEETING </div>
-        <div class="task-time">06/05/2026 17:30:00 → 06/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">BIPS CREATIVE</div>
-        <div class="task-time">06/05/2026 14:00:00 → 06/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">bips creative Revised </div>
-        <div class="task-time">06/05/2026 12:00:00 → 06/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">TYO Sharing </div>
-        <div class="task-time">06/05/2026 09:30:00 → 06/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Bips Creative Revised Checklist marking </div>
-        <div class="task-time">05/05/2026 17:30:00 → 05/05/2026 18:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">Prepare BZ,Spa Kora , Content Celender ( may ) </div>
-        <div class="task-time">05/05/2026 14:00:00 → 05/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">BIPS Creatives Revised </div>
-        <div class="task-time">05/05/2026 12:00:00 → 05/05/2026 13:00:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Diksha">
-      <div class="emp-header">
-        <div class="emp-avatar">D</div>
-        <div class="emp-info">
-          <h3>Diksha</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">2 total tasks</span>
-            <span class="stat-badge recent">2 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">16 Apr 2026</div>
-        <div class="task-title">Lunch Break</div>
-        <div class="task-time">16/04/2026 13:10:00 → 16/04/2026 13:50:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">16 Apr 2026</div>
-        <div class="task-title">Daily HO meeting</div>
-        <div class="task-time">16/04/2026 11:35:00 → 16/04/2026 12:00:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Santosh K">
-      <div class="emp-header">
-        <div class="emp-avatar">S</div>
-        <div class="emp-info">
-          <h3>Santosh K</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">29 total tasks</span>
-            <span class="stat-badge recent">29 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. 🏖️ Has leave entries. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Interview arranged with CMD Sir for Parmod Verma.</div>
-        <div class="task-time">20/04/2026 17:15:00 → 20/04/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Full and Final Hitisha</div>
-        <div class="task-time">20/04/2026 16:30:00 → 20/04/2026 17:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Conducted the first round of interview for Parmod Verma.</div>
-        <div class="task-time">20/04/2026 15:45:00 → 20/04/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Conducted the first round of interview for Mr. Eshan.</div>
-        <div class="task-time">20/04/2026 15:15:00 → 20/04/2026 15:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">HR Operation work leave approval</div>
-        <div class="task-time">20/04/2026 14:45:00 → 20/04/2026 15:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Filtered 10 candidates’ CVs for the interview.</div>
-        <div class="task-time">20/04/2026 14:00:00 → 20/04/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Scheduled the final round of interview for Mr. Pritam Roy with CMD Sir.</div>
-        <div class="task-time">20/04/2026 12:30:00 → 20/04/2026 13:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Followed up with Mr. Goti regarding the payment.</div>
-        <div class="task-time">20/04/2026 10:45:00 → 20/04/2026 11:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">20 Apr 2026</div>
-        <div class="task-title">Conducted the first round of interview for Pritam Roy for the Floor Manager position.</div>
-        <div class="task-time">20/04/2026 10:15:00 → 20/04/2026 10:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">HR operational work includes leave and short leave approval.</div>
-        <div class="task-time">17/04/2026 17:30:00 → 17/04/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">searching Airlines for US</div>
-        <div class="task-time">17/04/2026 17:00:00 → 17/04/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">Coordinated with staff for OTP and for some printouts.</div>
-        <div class="task-time">17/04/2026 16:00:00 → 17/04/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">Communicated with Deepmala ma'am for desposable comb and Spa Kora Uniform </div>
-        <div class="task-time">17/04/2026 15:00:00 → 17/04/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">PO Ultra Tech cement</div>
-        <div class="task-time">17/04/2026 14:00:00 → 17/04/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">Full and final payment of Ms Anjana</div>
-        <div class="task-time">17/04/2026 12:30:00 → 17/04/2026 13:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">17 Apr 2026</div>
-        <div class="task-title">Working on Jasnam's  US Visa</div>
-        <div class="task-time">17/04/2026 10:15:00 → 17/04/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">16 Apr 2026</div>
-        <div class="task-title">marked delegation and checklist</div>
-        <div class="task-time">16/04/2026 17:45:00 → 16/04/2026 18:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">16 Apr 2026</div>
-        <div class="task-title">Coordinated with Mr Vikram for creative of Floor manager </div>
-        <div class="task-time">16/04/2026 17:15:00 → 16/04/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">16 Apr 2026</div>
-        <div class="task-title">Entries in  exist form of employees</div>
-        <div class="task-time">16/04/2026 16:30:00 → 16/04/2026 17:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">16 Apr 2026</div>
-        <div class="task-title">Coordinate with Ultra Tech cement vendor for purchase </div>
-        <div class="task-time">16/04/2026 16:00:00 → 16/04/2026 16:30:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Devinder">
-      <div class="emp-header">
-        <div class="emp-avatar">D</div>
-        <div class="emp-info">
-          <h3>Devinder</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">108 total tasks</span>
-            <span class="stat-badge recent">108 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. 🏖️ Has leave entries. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Meeting with MD sir</div>
-        <div class="task-time">11/05/2026 18:15:00 → 11/05/2026 19:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">blog ads  on Spa Kora & backlinks</div>
-        <div class="task-time">11/05/2026 16:15:00 → 11/05/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">weekly ads report organic & paid share with MR Raj</div>
-        <div class="task-time">11/05/2026 14:00:00 → 11/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">Create presentation for how to improve organic enquries PPT</div>
-        <div class="task-time">11/05/2026 12:00:00 → 11/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Short leave</div>
-        <div class="task-time">09/05/2026 16:30:00 → 09/05/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">Image submissions For spa kora deep tissue</div>
-        <div class="task-time">09/05/2026 16:00:00 → 09/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">GMX meeting Attend</div>
-        <div class="task-time">09/05/2026 15:15:00 → 09/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">blog add in Spa kora and create backlinks</div>
-        <div class="task-time">09/05/2026 13:45:00 → 09/05/2026 15:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">infographic submisisons</div>
-        <div class="task-time">09/05/2026 12:00:00 → 09/05/2026 13:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">Half Day</div>
-        <div class="task-time">08/05/2026 15:00:00 → 08/05/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">stargetic meeting</div>
-        <div class="task-time">08/05/2026 10:45:00 → 08/05/2026 13:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Image submissions bodyzone</div>
-        <div class="task-time">07/05/2026 16:30:00 → 07/05/2026 17:45:00</div>
-        <div class="task-desc"><br><a href="https://padlet.com/bodyzonechandigarh/bodyzone-sv3bboqmra41u3o9/wish/wKmOZ571kM5yazMA">https://padlet.com/bodyzonechandigarh/bodyzone-sv3bboqmra41u3o9/wish/wKmOZ571kM5yazMA</a><br><a href="https://justpaste.it/n4u1u">https://justpaste.it/n4u1u</a><br><a href="https://kuula.co/post/LkhJF">https://kuula.co/post/LkhJF</a><br><a href="https://www.flickr.com/photos/158584989@N04">https://www.flickr.com/photos/158584989@N04</a><br><a href="https://giphy.com/gifs/yoga-classes-yogaclasses-p0PfBVrv2qluU0Y1dr">https://giphy.com/gifs/yoga-classes-yogaclasses-p0PfBVrv2qluU0Y1dr</a><br><a href="https://in.pinterest.com/pin/235594624252964937/">https://in.pinterest.com/pin/235594624252964937/</a><br><a href="https://postimg.cc/gallery/vdtYRwz">https://postimg.cc/gallery/vdtYRwz</a></div>
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Add whatsapp new link in Bodyzone Spa kora  COLLAB With blacksynq.ai </div>
-        <div class="task-time">07/05/2026 14:00:00 → 07/05/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">07 May 2026</div>
-        <div class="task-title">Meta Tags Update in ABC Montessori Website</div>
-        <div class="task-time">07/05/2026 12:00:00 → 07/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Meeting with Amit sir sales analytics </div>
-        <div class="task-time">06/05/2026 17:15:00 → 06/05/2026 17:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">BIPS Patiala Add Blog and create backlinks </div>
-        <div class="task-time">06/05/2026 16:00:00 → 06/05/2026 17:00:00</div>
-        <div class="task-desc">Benefits of English Medium Education in Today’s World<br><a href="https://www.bipspatiala.net/benefits-of-english-medium-education.html">https://www.bipspatiala.net/benefits-of-english-medium-education.html</a><br>Learn the benefits of English medium education for children. Improve communication, confidence, and career opportunities with quality learning.<br><br><a href="https://diigo.com/012iume">https://diigo.com/012iume</a><br><a href="https://www.scoop.it/topic/school-452/p/4171138896/2026/05/06/benefits-of-english-medium-education-in-today-s-world">https://www.scoop.it/topic/school-452/p/4171138896/2026/05/06/benefits-of-english-medium-education-in-today-s-world</a><br><a href="https://coolpot.com/story/news/benefits-of-english-medium-education-in-todays-world">https://coolpot.com/story/news/benefits-of-english-medium-education-in-todays-world</a><br><a href="https://1look4.com/story/news/benefits-of-english-medium-education-in-todays-world">https://1look4.com/story/news/benefits-of-english-medium-education-in-todays-world</a><br><a href="https://www.pearltrees.com/bipsschool#item795047910">https://www.pearltrees.com/bipsschool#item795047910</a><br><a href="https://coolpot.com/story/news/benefits-of-english-medium-education-in-todays-world-fxg">https://coolpot.com/story/news/benefits-of-english-medium-education-in-todays-world-fxg</a><br><a href="https://free-socialbookmarking.com/story/benefits-of-english-medium-education-in-today-s-world">https://free-socialbookmarking.com/story/benefits-of-english-medium-education-in-today-s-world</a><br><a href="https://www.socialbookmarkssite.com/bookmark/6249319/benefits-of-english-medium-education-in-today-s-world/">https://www.socialbookmarkssite.com/bookmark/6249319/benefits-of-english-medium-education-in-today-s-world/</a><br><a href="https://www.instapaper.com/read/2009107847">https://www.instapaper.com/read/2009107847</a><br><a href="https://www.moptu.com/bipspatiala~810999">https://www.moptu.com/bipspatiala~810999</a></div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Create Blog and publish in BIPS Preschool & Create backlinks</div>
-        <div class="task-time">06/05/2026 15:00:00 → 06/05/2026 16:00:00</div>
-        <div class="task-desc"><a href="https://www.bipspreschool.com/blog/why-fine-motor-skills-are-important-in-early-childhood-development.html">https://www.bipspreschool.com/blog/why-fine-motor-skills-are-important-in-early-childhood-development.html</a><br>Learn why fine motor skills are important for preschoolers. Discover fun activities and how BIPS Preschool supports early childhood development.<br><br><a href="https://www.tumblr.com/bipspreschool/815862643141296128/why-fine-motor-skills-are-important-in-early?source=share">https://www.tumblr.com/bipspreschool/815862643141296128/why-fine-motor-skills-are-important-in-early?source=share</a><br><a href="https://www.pearltrees.com/bipspreschool#item795053041">https://www.pearltrees.com/bipspreschool#item795053041</a><br><a href="https://coolpot.com/story/news/why-fine-motor-skills-are-important-in-early-childhood-development">https://coolpot.com/story/news/why-fine-motor-skills-are-important-in-early-childhood-development</a><br><a href="https://diigo.com/012iv4c">https://diigo.com/012iv4c</a><br><a href="https://1look4.com/story/news/why-fine-motor-skills-are-important-in-early-childhood-development">https://1look4.com/story/news/why-fine-motor-skills-are-important-in-early-childhood-development</a><br><a href="https://www.bibsonomy.org/url/ac84c7dc046f44ffc5c8f595c341f2db?postOwner=bipspreschool&amp;intraHash=ac84c7dc046f44ffc5c8f595c341f2db#discussion-section">https://www.bibsonomy.org/url/ac84c7dc046f44ffc5c8f595c341f2db?postOwner=bipspreschool&amp;intraHash=ac84c7dc046f44ffc5c8f595c341f2db#discussion-section</a><br><a href="https://www.pinterest.com/pin/1019572803162365767">https://www.pinterest.com/pin/1019572803162365767</a><br><a href="https://flipboard.com/@BIPSPreschool/magazines/sid%2Flc8qjm15y%2Fbipspreschool/edit">https://flipboard.com/@BIPSPreschool/magazines/sid%2Flc8qjm15y%2Fbipspreschool/edit</a><br><a href="https://sco.lt/5z2HFA">https://sco.lt/5z2HFA</a></div>
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">1 BIPS Ads Run</div>
-        <div class="task-time">06/05/2026 14:15:00 → 06/05/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">ABCM Dirba Post</div>
-        <div class="task-time">06/05/2026 12:30:00 → 06/05/2026 13:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">Create Reel for Bodyzone</div>
-        <div class="task-time">06/05/2026 12:00:00 → 06/05/2026 12:30:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Alok">
-      <div class="emp-header">
-        <div class="emp-avatar">A</div>
-        <div class="emp-info">
-          <h3>Alok</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">113 total tasks</span>
-            <span class="stat-badge recent">113 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. ✅ Conducting audits. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">SALES ENYTRY MADE IN TALLY AND RECO WITH BANKS AND SALES  GET GSTR-1 FILE AND TASK MARK CALENDAR PREPARED  </div>
-        <div class="task-time">11/05/2026 17:00:00 → 11/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">ALL BILLS BOOKED IN TALLY AND FILE MAKE FOR FY 26-27 AND ATTACHED ALL BILLS</div>
-        <div class="task-time">11/05/2026 16:00:00 → 11/05/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">SALES SHEET UPDATED OF BDZ AND SPA KORA</div>
-        <div class="task-time">11/05/2026 15:00:00 → 11/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">12 MONTH PLAN PREPARED</div>
-        <div class="task-time">11/05/2026 14:00:00 → 11/05/2026 15:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">12th MONTH PLAN PREPARED</div>
-        <div class="task-time">11/05/2026 12:00:00 → 11/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">PENDING BALANCE REPROT PREPARED AND SAHRED WITH MAM</div>
-        <div class="task-time">11/05/2026 11:30:00 → 11/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">AUDIT DONE OF BZ AND SPA KORA SALES AND SHARED WITH EA MAM</div>
-        <div class="task-time">11/05/2026 10:30:00 → 11/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">bank reco of all vertical done cordinate wit Yash regarding pending payment </div>
-        <div class="task-time">09/05/2026 16:30:00 → 09/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">suspense entry cleared</div>
-        <div class="task-time">09/05/2026 15:30:00 → 09/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">audit done of spa sales and meetin attend  of gymex</div>
-        <div class="task-time">09/05/2026 14:00:00 → 09/05/2026 15:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">audit done of bdz sales sheet with bank reco</div>
-        <div class="task-time">09/05/2026 12:00:00 → 09/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">sales enrty made in tally </div>
-        <div class="task-time">09/05/2026 11:00:00 → 09/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">visit bdz and prepared bdz and spa kora register</div>
-        <div class="task-time">09/05/2026 09:00:00 → 09/05/2026 10:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">BANK RECO OFF ALL VERTICAL ENTRY MADE IN TALLY AND TASK MARK CALANDER PRPEARED </div>
-        <div class="task-time">08/05/2026 17:00:00 → 08/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">SALES SHEET UPDATE DOF BDZ AND SPA KORA AND AUDIT DONE</div>
-        <div class="task-time">08/05/2026 16:00:00 → 08/05/2026 17:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">VIIST BDZ TO DISTRIBUTE BDZ SALARY</div>
-        <div class="task-time">08/05/2026 14:00:00 → 08/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">LUNCH TIME AND CASH DEPSOIT</div>
-        <div class="task-time">08/05/2026 13:00:00 → 08/05/2026 14:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">STRATGIK MEETING</div>
-        <div class="task-time">08/05/2026 10:00:00 → 08/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">VISIT BDZ AND PREPARED BDZ AND SPA KORA REGISTER</div>
-        <div class="task-time">08/05/2026 09:00:00 → 08/05/2026 10:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">TASK MARK CALENDAR PREPARED</div>
-        <div class="task-time">06/05/2026 18:00:00 → 06/05/2026 18:30:00</div>
-        
-      </div></div>
-    </div><div class="emp-card" data-employee="Rohit">
-      <div class="emp-header">
-        <div class="emp-avatar">R</div>
-        <div class="emp-info">
-          <h3>Rohit</h3>
-          <div class="emp-stats">
-            <span class="stat-badge">82 total tasks</span>
-            <span class="stat-badge recent">82 recent (30d)</span>
-          </div>
-        </div>
-      </div>
-      <div class="emp-insight">🤝 Regular meetings. 🏖️ Has leave entries. </div>
-      <div class="task-list"><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">PREPARE BIPS COLLECTION REPORT AND UPDATE IT</div>
-        <div class="task-time">11/05/2026 16:00:00 → 11/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">RECO. BIPS VENDOR LEDGER</div>
-        <div class="task-time">11/05/2026 14:45:00 → 11/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">VISTE BANK FOR CASH DEPOSITE</div>
-        <div class="task-time">11/05/2026 14:00:00 → 11/05/2026 14:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">11 May 2026</div>
-        <div class="task-title">PUTUP ALL PAYMENT VOUCHER OF BIPS, SOCIETY & GCS</div>
-        <div class="task-time">11/05/2026 12:00:00 → 11/05/2026 13:10:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">SHORT LEAVE</div>
-        <div class="task-time">09/05/2026 17:00:00 → 09/05/2026 18:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">PREPARE SALARY SLIP OF GCS P2 JAN26-MAR26</div>
-        <div class="task-time">09/05/2026 15:45:00 → 09/05/2026 16:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">MADE SOME URGENT PAYMENT OF BIPS & SOCIETY</div>
-        <div class="task-time">09/05/2026 15:00:00 → 09/05/2026 15:45:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">RECO. VENDORS LEDGER OF BIPS </div>
-        <div class="task-time">09/05/2026 14:00:00 → 09/05/2026 15:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">09 May 2026</div>
-        <div class="task-title">UPDATE FIXED MONTHLY EXPENSES IN BANK BAL. SHEET OF ALL VERTCALS</div>
-        <div class="task-time">09/05/2026 12:00:00 → 09/05/2026 13:10:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">PREPARE PENDING PAYMENT LIST</div>
-        <div class="task-time">08/05/2026 16:00:00 → 08/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">UPDATE BOOKS OF BIPS & SOCIETY</div>
-        <div class="task-time">08/05/2026 14:45:00 → 08/05/2026 16:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">PREPARE SOFT COPY OF BIPS STAFF SALARY SHEET AND MAIL THAT FOR PAYMENTS</div>
-        <div class="task-time">08/05/2026 12:00:00 → 08/05/2026 13:10:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">08 May 2026</div>
-        <div class="task-title">STRATEGIC METTING </div>
-        <div class="task-time">08/05/2026 10:00:00 → 08/05/2026 12:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">MAKE VENDOR PAYMENT AND AGGANGE FUND FOR EMI </div>
-        <div class="task-time">06/05/2026 16:30:00 → 06/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">METTING WITH CA SIR & MD SIR</div>
-        <div class="task-time">06/05/2026 15:30:00 → 06/05/2026 16:15:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">RECO CASH BOOK OF BIPS</div>
-        <div class="task-time">06/05/2026 14:00:00 → 06/05/2026 15:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">PREPARE SALARY OF P2</div>
-        <div class="task-time">06/05/2026 12:00:00 → 06/05/2026 13:00:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">06 May 2026</div>
-        <div class="task-title">PREPARE SALARY OF BIPS </div>
-        <div class="task-time">06/05/2026 10:00:00 → 06/05/2026 11:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">COORDINATES WITH CA SIR RELATED TO BIPS COLLECTION FY 2025-26</div>
-        <div class="task-time">05/05/2026 16:30:00 → 05/05/2026 17:30:00</div>
-        
-      </div><div class="task-item">
-        <div class="task-date">05 May 2026</div>
-        <div class="task-title">VISTE #104 FOR OFFICAL WORK</div>
-        <div class="task-time">05/05/2026 15:30:00 → 05/05/2026 16:30:00</div>
-        
-      </div></div>
-    </div></div>
-<div class="footer">GCS Team Report • Auto-updated daily at 1:00 PM IST • Data from Google Calendar</div>
+
+<div class="footer">GCS Team Report &bull; Auto-generated &bull; Data from Google Sheets &bull; Last updated: Thursday, 14 May 2026 at 1:15 pm IST</div>
+
 <script>
-function filterByDate(date) {
-  const cards = document.querySelectorAll('.emp-card');
-  let visible = 0;
-  cards.forEach(card => {
-    if (!date) { card.classList.remove('hidden'); visible++; return; }
-    const tasks = card.querySelectorAll('.task-date');
-    let found = false;
-    tasks.forEach(t => { if (t.textContent === date) found = true; });
-    if (found) { card.classList.remove('hidden'); visible++; }
-    else card.classList.add('hidden');
+let currentFilter = 'all';
+function filterCards() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.emp-card').forEach(card => {
+    const nameMatch = card.dataset.name.includes(q);
+    const textMatch = card.innerText.toLowerCase().includes(q);
+    const filterMatch = currentFilter === 'all' || (currentFilter === 'today' && card.querySelector('.today-badge'));
+    card.classList.toggle('hidden', !(nameMatch || textMatch) || !filterMatch);
   });
-  document.getElementById('statVisible').textContent = visible;
 }
-function filterBySearch(q) {
-  const cards = document.querySelectorAll('.emp-card');
-  let visible = 0;
-  const lq = q.toLowerCase();
-  cards.forEach(card => {
-    if (!lq) { card.classList.remove('hidden'); visible++; return; }
-    if (card.textContent.toLowerCase().includes(lq)) { card.classList.remove('hidden'); visible++; }
-    else card.classList.add('hidden');
-  });
-  document.getElementById('statVisible').textContent = visible;
-}
-function resetFilters() {
-  document.getElementById('dateFilter').value = '';
-  document.getElementById('searchBox').value = '';
-  document.querySelectorAll('.emp-card').forEach(c => c.classList.remove('hidden'));
-  document.getElementById('statVisible').textContent = '12';
+function setFilter(f) {
+  currentFilter = f;
+  document.getElementById('btn-all').classList.toggle('active', f==='all');
+  document.getElementById('btn-today').classList.toggle('active', f==='today');
+  filterCards();
 }
 </script>
 </body>
